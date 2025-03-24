@@ -20,3 +20,16 @@ export type PortfolioWithName = Portfolio & {
   name: string;
   unique_id?: string;
 };
+
+export type Order = {
+  instrument_id: number;
+  side: "BUY" | "SELL";
+  type: "MARKET" | "LIMIT";
+  quantity: number;
+  price?: number;
+};
+
+export type OrderResponse = {
+  id: string;
+  status: "PENDING" | "REJECTED" | "FILLED";
+};
