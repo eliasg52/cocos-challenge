@@ -12,6 +12,7 @@ import { useLocalSearchParams } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import OrderInfo from "@/components/OrderInfo";
 import { useOrderForm } from "@/hooks/useOrderForm";
 import { formatCurrency } from "@/utils";
 
@@ -242,49 +243,7 @@ export default function CreateOrderScreen() {
               </TouchableOpacity>
             </ThemedView>
 
-            <ThemedView style={styles.helpCard}>
-              <ThemedText style={styles.helpTitle}>
-                Order Information
-              </ThemedText>
-
-              <ThemedText style={styles.helpSectionTitle}>
-                Order Types:
-              </ThemedText>
-              <ThemedText style={styles.helpText}>
-                <ThemedText style={styles.helpBold}>MARKET:</ThemedText> Orders
-                executed immediately at the current market price.
-              </ThemedText>
-              <ThemedText style={styles.helpText}>
-                <ThemedText style={styles.helpBold}>LIMIT:</ThemedText> Orders
-                executed only at the specified price or better.
-              </ThemedText>
-
-              <ThemedText style={styles.helpSectionTitle}>
-                Order Status:
-              </ThemedText>
-              <View style={styles.statusRow}>
-                <View style={[styles.statusDot, styles.statusFilledDot]} />
-                <ThemedText style={styles.helpText}>
-                  <ThemedText style={styles.helpBold}>FILLED:</ThemedText> Order
-                  has been executed. All MARKET orders are executed immediately.
-                </ThemedText>
-              </View>
-              <View style={styles.statusRow}>
-                <View style={[styles.statusDot, styles.statusPendingDot]} />
-                <ThemedText style={styles.helpText}>
-                  <ThemedText style={styles.helpBold}>PENDING:</ThemedText>{" "}
-                  LIMIT orders waiting to be executed at the specified price.
-                </ThemedText>
-              </View>
-              <View style={styles.statusRow}>
-                <View style={[styles.statusDot, styles.statusRejectedDot]} />
-                <ThemedText style={styles.helpText}>
-                  <ThemedText style={styles.helpBold}>REJECTED:</ThemedText>{" "}
-                  Order has been rejected due to insufficient funds or other
-                  reasons.
-                </ThemedText>
-              </View>
-            </ThemedView>
+            <OrderInfo />
           </>
         )}
       </ScrollView>
@@ -446,55 +405,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FF3B30",
     textAlign: "center",
-  },
-  helpCard: {
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: "#F2F2F7",
-    marginBottom: 32,
-  },
-  helpTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
-    color: "#1C1C1E",
-  },
-  helpSectionTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginTop: 12,
-    marginBottom: 6,
-    color: "#1C1C1E",
-  },
-  helpText: {
-    fontSize: 14,
-    color: "#3A3A3C",
-    marginBottom: 6,
-    lineHeight: 20,
-  },
-  helpBold: {
-    fontWeight: "600",
-    color: "#1C1C1E",
-  },
-  statusRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  statusDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 8,
-  },
-  statusFilledDot: {
-    backgroundColor: "#34C759", // Green
-  },
-  statusPendingDot: {
-    backgroundColor: "#FF9500", // Orange
-  },
-  statusRejectedDot: {
-    backgroundColor: "#FF3B30", // Red
   },
 });
