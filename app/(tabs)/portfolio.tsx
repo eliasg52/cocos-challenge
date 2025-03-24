@@ -2,24 +2,17 @@ import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { PortfolioWithName } from "@/types";
 import { useEnhancedPortfolio } from "@/hooks/useEnhancedPortfolio";
+import {
+  calculatePortfolioItemDetails,
+  calculateTotalPortfolioValue,
+  calculateTotalPortfolioProfit,
+  getValueType,
+  formatCurrency,
+} from "@/utils";
 
 export default function PortfolioScreen() {
   const { data: portfolio = [], isLoading, error } = useEnhancedPortfolio();
-
-  const getPortfolioItemDetails = (item: PortfolioWithName) => {
-    const totalValue = item.quantity * item.last_price;
-    const totalCost = item.quantity * item.avg_cost_price;
-    const profit = totalValue - totalCost;
-    const profitPercentage = (profit / totalCost) * 100;
-
-    return {
-      totalValue,
-      profit,
-      profitPercentage,
-    };
-  };
 
   if (isLoading) {
     return (
@@ -37,6 +30,9 @@ export default function PortfolioScreen() {
     );
   }
 
+  const totalValue = calculateTotalPortfolioValue(portfolio);
+  const totalProfit = calculateTotalPortfolioProfit(portfolio);
+
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.title}>Portfolio</ThemedText>
@@ -44,38 +40,15 @@ export default function PortfolioScreen() {
         <View>
           <ThemedText style={styles.summaryLabel}>Total Value</ThemedText>
           <ThemedText style={styles.summaryValue}>
-            $
-            {portfolio
-              .reduce((acc, item) => acc + item.quantity * item.last_price, 0)
-              .toFixed(2)}
+            {formatCurrency(totalValue)}
           </ThemedText>
         </View>
         <View>
           <ThemedText style={styles.summaryLabel}>Total Profit</ThemedText>
           <ThemedText
-            style={[
-              styles.summaryValue,
-              portfolio.reduce(
-                (acc, item) =>
-                  acc +
-                  item.quantity * item.last_price -
-                  item.quantity * item.avg_cost_price,
-                0
-              ) > 0
-                ? styles.positive
-                : styles.negative,
-            ]}
+            style={[styles.summaryValue, styles[getValueType(totalProfit)]]}
           >
-            $
-            {portfolio
-              .reduce(
-                (acc, item) =>
-                  acc +
-                  item.quantity * item.last_price -
-                  item.quantity * item.avg_cost_price,
-                0
-              )
-              .toFixed(2)}
+            {formatCurrency(totalProfit)}
           </ThemedText>
         </View>
       </ThemedView>
@@ -86,7 +59,7 @@ export default function PortfolioScreen() {
         data={portfolio}
         renderItem={({ item }) => {
           const { totalValue, profit, profitPercentage } =
-            getPortfolioItemDetails(item);
+            calculatePortfolioItemDetails(item);
 
           return (
             <ThemedView style={styles.portfolioItem}>
@@ -99,15 +72,12 @@ export default function PortfolioScreen() {
               </View>
               <View style={styles.portfolioValue}>
                 <ThemedText style={styles.totalValue}>
-                  ${totalValue.toFixed(2)}
+                  {formatCurrency(totalValue)}
                 </ThemedText>
                 <ThemedText
-                  style={[
-                    styles.profit,
-                    profit > 0 ? styles.positive : styles.negative,
-                  ]}
+                  style={[styles.profit, styles[getValueType(profit)]]}
                 >
-                  ${profit.toFixed(2)} ({profitPercentage.toFixed(2)}%)
+                  {formatCurrency(profit)} ({profitPercentage.toFixed(2)}%)
                 </ThemedText>
               </View>
             </ThemedView>
@@ -188,6 +158,9 @@ const styles = StyleSheet.create({
   },
   negative: {
     color: "red",
+  },
+  neutral: {
+    color: "#888",
   },
   summary: {
     padding: 16,

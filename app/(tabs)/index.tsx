@@ -1,12 +1,22 @@
-import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  View,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import { useRouter } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import SearchBar from "@/components/SearchBar";
 import useSearchTicker from "@/hooks/useSearchTicker";
 import { useInstruments } from "@/hooks/useInstruments";
+import { Instrument } from "@/types";
+import { calculateReturn, formatCurrency, getReturnType } from "@/utils";
 
 export default function HomeScreen() {
+  const router = useRouter();
   const {
     data: instruments,
     isLoading,
@@ -22,6 +32,18 @@ export default function HomeScreen() {
 
   const displayData = searchQuery ? searchResults : instruments;
   const error = instrumentsError || (searchQuery ? searchError : null);
+
+  const handleInstrumentPress = (instrument: Instrument) => {
+    router.push({
+      pathname: "order" as any,
+      params: {
+        id: instrument.id,
+        name: instrument.name,
+        ticker: instrument.ticker,
+        last_price: instrument.last_price,
+      },
+    });
+  };
 
   if (isLoading && !searchQuery) {
     return (
@@ -54,29 +76,27 @@ export default function HomeScreen() {
         contentContainerStyle={styles.listContent}
         data={displayData}
         renderItem={({ item }) => (
-          <ThemedView style={styles.instrument}>
-            <View style={styles.instrumentInfo}>
-              <ThemedText style={styles.name}>{item.name}</ThemedText>
-              <ThemedText style={styles.ticker}>{item.ticker}</ThemedText>
-            </View>
-            <View style={styles.priceInfo}>
-              <ThemedText style={styles.price}>{item.last_price}</ThemedText>
-              <ThemedText
-                style={[
-                  styles.change,
-                  item.last_price - item.close_price > 0
-                    ? styles.positive
-                    : styles.negative,
-                ]}
-              >
-                {(
-                  ((item.last_price - item.close_price) / item.close_price) *
-                  100
-                ).toFixed(2)}
-                %
-              </ThemedText>
-            </View>
-          </ThemedView>
+          <TouchableOpacity onPress={() => handleInstrumentPress(item)}>
+            <ThemedView style={styles.instrument}>
+              <View style={styles.instrumentInfo}>
+                <ThemedText style={styles.name}>{item.name}</ThemedText>
+                <ThemedText style={styles.ticker}>{item.ticker}</ThemedText>
+              </View>
+              <View style={styles.priceInfo}>
+                <ThemedText style={styles.price}>
+                  {formatCurrency(item.last_price)}
+                </ThemedText>
+                <ThemedText
+                  style={[
+                    styles.change,
+                    styles[getReturnType(item.last_price, item.close_price)],
+                  ]}
+                >
+                  {calculateReturn(item.last_price, item.close_price)}
+                </ThemedText>
+              </View>
+            </ThemedView>
+          </TouchableOpacity>
         )}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={
@@ -150,6 +170,9 @@ const styles = StyleSheet.create({
   },
   negative: {
     color: "red",
+  },
+  neutral: {
+    color: "#888",
   },
   emptyContainer: {
     padding: 24,

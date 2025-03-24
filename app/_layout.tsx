@@ -64,6 +64,14 @@ function SafeAreaAwareLayout({
                 headerShown: false,
               }}
             />
+            <Stack.Screen
+              name="order"
+              options={{
+                headerShown: false,
+                title: "Orders",
+                presentation: "modal",
+              }}
+            />
             <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
