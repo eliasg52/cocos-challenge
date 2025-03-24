@@ -17,11 +17,10 @@ import {
 } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme() ?? "light"; // ✅ Ahora siempre tiene un valor
+  const colorScheme = useColorScheme() ?? "light";
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
@@ -54,7 +53,12 @@ function SafeAreaAwareLayout({
     <ThemedView style={{ flex: 1, paddingTop: insets.top }}>
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(tabs)"
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />

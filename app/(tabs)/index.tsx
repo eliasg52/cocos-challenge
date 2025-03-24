@@ -1,33 +1,54 @@
-import { StyleSheet, Platform, FlatList, View } from "react-native";
+import {
+  StyleSheet,
+  Platform,
+  FlatList,
+  View,
+  ActivityIndicator,
+} from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useEffect, useState } from "react";
 import tradingApi from "@/api/tradingApi";
+import SearchBar from "@/components/SearchBar";
+import useSearchTicker from "@/hooks/useSearchTicker";
+import { Instrument } from "@/types";
 
 export default function HomeScreen() {
-  interface Instrument {
-    id: number;
-    ticker: string;
-    name: string;
-    type: string;
-    last_price: number;
-    close_price: number;
-  }
-
   const [instruments, setInstruments] = useState<Instrument[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { searchQuery, searchResults, isSearching, handleSearch } =
+    useSearchTicker();
 
   useEffect(() => {
-    tradingApi.getInstruments().then(setInstruments);
+    tradingApi.getInstruments().then((data) => {
+      setInstruments(data);
+      setIsLoading(false);
+    });
   }, []);
+
+  const displayData = searchQuery ? searchResults : instruments;
+
+  if (isLoading) {
+    return (
+      <ThemedView style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" />
+      </ThemedView>
+    );
+  }
 
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.title}>Trading</ThemedText>
+      <SearchBar
+        value={searchQuery}
+        onSearch={handleSearch}
+        isSearching={isSearching}
+      />
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.listContent}
-        data={instruments}
+        data={displayData}
         renderItem={({ item }) => (
           <ThemedView style={styles.instrument}>
             <View style={styles.instrumentInfo}>
@@ -54,6 +75,15 @@ export default function HomeScreen() {
           </ThemedView>
         )}
         keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={
+          <ThemedView style={styles.emptyContainer}>
+            <ThemedText style={styles.emptyText}>
+              {searchQuery
+                ? "No instruments found for your search"
+                : "No instruments available"}
+            </ThemedText>
+          </ThemedView>
+        }
       />
     </ThemedView>
   );
@@ -62,6 +92,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  centered: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
@@ -112,5 +146,14 @@ const styles = StyleSheet.create({
   },
   negative: {
     color: "red",
+  },
+  emptyContainer: {
+    padding: 24,
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#888",
+    textAlign: "center",
   },
 });
