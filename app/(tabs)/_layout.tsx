@@ -36,16 +36,16 @@ export default function TabLayout() {
         options={{
           title: "Trading",
           tabBarIcon: ({ color }) => (
-            <AntDesign name="linechart" size={28} color={color} />
+            <AntDesign name="linechart" size={26} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="portfolio"
         options={{
           title: "Portfolio",
           tabBarIcon: ({ color }) => (
-            <Entypo name="suitcase" size={28} color={color} />
+            <Entypo name="suitcase" size={26} color={color} />
           ),
         }}
       />

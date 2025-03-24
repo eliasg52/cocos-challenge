@@ -15,3 +15,8 @@ export type Portfolio = {
   close_price: number;
   avg_cost_price: number;
 };
+
+export type PortfolioWithName = Portfolio & {
+  name: string;
+  unique_id?: string;
+};

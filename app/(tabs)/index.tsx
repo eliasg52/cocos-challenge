@@ -1,14 +1,8 @@
-import {
-  StyleSheet,
-  Platform,
-  FlatList,
-  View,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
+import { useEffect, useState } from "react";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useEffect, useState } from "react";
 import tradingApi from "@/api/tradingApi";
 import SearchBar from "@/components/SearchBar";
 import useSearchTicker from "@/hooks/useSearchTicker";

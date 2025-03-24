@@ -1,17 +1,12 @@
-import { StyleSheet, Platform, FlatList, View } from "react-native";
+import { StyleSheet, FlatList, View } from "react-native";
+import { useEffect, useState } from "react";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { useEffect, useState } from "react";
 import tradingApi from "@/api/tradingApi";
-import { Instrument, Portfolio } from "@/types";
+import { Instrument, PortfolioWithName } from "@/types";
 
-export default function TabTwoScreen() {
-  type PortfolioWithName = Portfolio & {
-    name: string;
-    unique_id?: string;
-  };
-
+export default function PortfolioScreen() {
   const [portfolio, setPortfolio] = useState<PortfolioWithName[]>([]);
   const [_, setInstruments] = useState<Instrument[]>([]);
 
