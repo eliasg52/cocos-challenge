@@ -9,6 +9,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import {
@@ -48,21 +49,26 @@ function SafeAreaAwareLayout({
   colorScheme: "light" | "dark";
 }) {
   const insets = useSafeAreaInsets();
+  const queryClient = new QueryClient();
 
   return (
-    <ThemedView style={{ flex: 1, paddingTop: insets.top }}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      </ThemeProvider>
-    </ThemedView>
+    <QueryClientProvider client={queryClient}>
+      <ThemedView style={{ flex: 1, paddingTop: insets.top }}>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen
+              name="(tabs)"
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+        </ThemeProvider>
+      </ThemedView>
+    </QueryClientProvider>
   );
 }

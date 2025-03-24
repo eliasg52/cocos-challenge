@@ -1,29 +1,29 @@
 import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
-import { useEffect, useState } from "react";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import tradingApi from "@/api/tradingApi";
 import SearchBar from "@/components/SearchBar";
 import useSearchTicker from "@/hooks/useSearchTicker";
-import { Instrument } from "@/types";
+import { useInstruments } from "@/hooks/useInstruments";
 
 export default function HomeScreen() {
-  const [instruments, setInstruments] = useState<Instrument[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { searchQuery, searchResults, isSearching, handleSearch } =
-    useSearchTicker();
-
-  useEffect(() => {
-    tradingApi.getInstruments().then((data) => {
-      setInstruments(data);
-      setIsLoading(false);
-    });
-  }, []);
+  const {
+    data: instruments,
+    isLoading,
+    error: instrumentsError,
+  } = useInstruments();
+  const {
+    searchQuery,
+    searchResults,
+    isSearching,
+    handleSearch,
+    error: searchError,
+  } = useSearchTicker();
 
   const displayData = searchQuery ? searchResults : instruments;
+  const error = instrumentsError || (searchQuery ? searchError : null);
 
-  if (isLoading) {
+  if (isLoading && !searchQuery) {
     return (
       <ThemedView style={[styles.container, styles.centered]}>
         <ActivityIndicator size="large" />
@@ -34,11 +34,21 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.title}>Trading</ThemedText>
+
       <SearchBar
         value={searchQuery}
         onSearch={handleSearch}
         isSearching={isSearching}
       />
+
+      {error && (
+        <ThemedView style={styles.errorContainer}>
+          <ThemedText style={styles.errorText}>
+            Error: {error.message}
+          </ThemedText>
+        </ThemedView>
+      )}
+
       <FlatList
         style={styles.list}
         contentContainerStyle={styles.listContent}
@@ -149,5 +159,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#888",
     textAlign: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
+  },
+  errorContainer: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 12,
+    backgroundColor: "#ffeeee",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ffcccc",
   },
 });

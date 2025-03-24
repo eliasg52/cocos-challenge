@@ -1,38 +1,12 @@
-import { StyleSheet, FlatList, View } from "react-native";
-import { useEffect, useState } from "react";
+import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import tradingApi from "@/api/tradingApi";
-import { Instrument, PortfolioWithName } from "@/types";
+import { PortfolioWithName } from "@/types";
+import { useEnhancedPortfolio } from "@/hooks/useEnhancedPortfolio";
 
 export default function PortfolioScreen() {
-  const [portfolio, setPortfolio] = useState<PortfolioWithName[]>([]);
-  const [_, setInstruments] = useState<Instrument[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const instrumentsData = await tradingApi.getInstruments();
-      setInstruments(instrumentsData);
-
-      const portfolioData = await tradingApi.getPortfolio();
-      if (instrumentsData.length && portfolioData.length) {
-        const portfolioWithNames = portfolioData.map((item, index) => {
-          const instrument = instrumentsData.find(
-            (instr) => instr.id === item.instrument_id
-          );
-          return {
-            ...item,
-            name: instrument?.name || "Unknown",
-            unique_id: `${item.instrument_id}-${item.quantity}-${index}`,
-          };
-        });
-        setPortfolio(portfolioWithNames);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const { data: portfolio = [], isLoading, error } = useEnhancedPortfolio();
 
   const getPortfolioItemDetails = (item: PortfolioWithName) => {
     const totalValue = item.quantity * item.last_price;
@@ -46,6 +20,22 @@ export default function PortfolioScreen() {
       profitPercentage,
     };
   };
+
+  if (isLoading) {
+    return (
+      <ThemedView style={[styles.container, styles.centered]}>
+        <ActivityIndicator size="large" />
+      </ThemedView>
+    );
+  }
+
+  if (error) {
+    return (
+      <ThemedView style={[styles.container, styles.centered]}>
+        <ThemedText style={styles.errorText}>Error: {error.message}</ThemedText>
+      </ThemedView>
+    );
+  }
 
   return (
     <ThemedView style={styles.container}>
@@ -141,6 +131,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  centered: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -219,5 +213,10 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: "#666",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
   },
 });

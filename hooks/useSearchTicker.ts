@@ -1,47 +1,64 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import tradingApi from "@/api/tradingApi";
 import { Instrument, UseSearchTickerResult } from "@/types";
 
 export const useSearchTicker = (): UseSearchTickerResult => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<Instrument[]>([]);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
+  // Separamos el estado del input (inmediato) del estado de la consulta (con debounce)
+  const [inputValue, setInputValue] = useState<string>("");
+  const [debouncedQuery, setDebouncedQuery] = useState<string>("");
+  const queryClient = useQueryClient();
 
-  const debounceSearch = useCallback(() => {
-    let timer: NodeJS.Timeout;
+  // Efecto para aplicar el debounce
+  useEffect(() => {
+    // Si el input está vacío, limpiamos la consulta inmediatamente
+    if (!inputValue) {
+      setDebouncedQuery("");
+      return;
+    }
 
-    return (query: string) => {
-      const uppercaseQuery = query.toUpperCase();
-      setSearchQuery(uppercaseQuery);
-      clearTimeout(timer);
+    // Aplicamos el debounce
+    const timer = setTimeout(() => {
+      setDebouncedQuery(inputValue);
+    }, 300);
 
-      if (!uppercaseQuery) {
-        setIsSearching(false);
-        setSearchResults([]);
-        return;
-      }
+    // Limpiamos el timer si el input cambia antes de que se complete el debounce
+    return () => clearTimeout(timer);
+  }, [inputValue]);
 
-      setIsSearching(true);
-      timer = setTimeout(async () => {
-        try {
-          const results = await tradingApi.searchInstrument(uppercaseQuery);
-          setSearchResults(results);
-        } catch (error) {
-          console.error("Error searching:", error);
-        } finally {
-          setIsSearching(false);
-        }
-      }, 300);
-    };
+  // Use React Query for search results
+  const {
+    data: searchResults = [],
+    isLoading: isSearching,
+    error,
+  } = useQuery<Instrument[], Error>({
+    queryKey: ["tickerSearch", debouncedQuery],
+    queryFn: () => tradingApi.searchInstrument(debouncedQuery),
+    enabled: debouncedQuery.length > 0, // Only search when there's a query
+    staleTime: 1000 * 60, // Results remain fresh for 1 minute
+    gcTime: 1000 * 60 * 5, // Garbage collection time
+    retry: 1, // Only retry once on failure
+  });
+
+  // Función para manejar cambios en el input - esto se ejecuta inmediatamente
+  const handleSearch = useCallback((query: string) => {
+    setInputValue(query.toUpperCase());
   }, []);
 
-  const handleSearch = debounceSearch();
+  // Prefetch initial instruments to improve UX
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["instruments"],
+      queryFn: tradingApi.getInstruments,
+    });
+  }, [queryClient]);
 
   return {
-    searchQuery,
-    searchResults,
+    searchQuery: inputValue, // Devolvemos el valor del input para mostrar en el UI
+    searchResults: searchResults || [],
     isSearching,
     handleSearch,
+    error,
   };
 };
 

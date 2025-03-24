@@ -11,4 +11,5 @@ export type UseSearchTickerResult = {
   searchResults: Instrument[];
   isSearching: boolean;
   handleSearch: (query: string) => void;
+  error?: Error | null;
 };
