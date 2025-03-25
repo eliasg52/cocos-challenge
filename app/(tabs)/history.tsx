@@ -91,7 +91,7 @@ export default function OrdersHistoryScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Order History</ThemedText>
+      <ThemedText style={styles.title}>Orders History</ThemedText>
 
       {isClearing ? (
         <ThemedView style={styles.loadingContainer}>

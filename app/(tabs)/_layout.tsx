@@ -52,7 +52,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="history"
         options={{
-          title: "Orders History",
+          title: "History",
           tabBarIcon: ({ color }) => (
             <Octicons name="history" size={26} color={color} />
           ),
