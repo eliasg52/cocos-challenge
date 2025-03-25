@@ -10,13 +10,15 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/icons/ios/icon.png"
+      "icon": "./assets/icons/iosIcon.png",
+      "bundleIdentifier": "com.eliasg52.cocoschallenge"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/androidIcon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.eliasg52.cocoschallenge"
     },
     "web": {
       "bundler": "metro",
