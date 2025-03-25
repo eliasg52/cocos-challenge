@@ -1,19 +1,38 @@
-import { StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import { StyleSheet, ScrollView, Dimensions } from "react-native";
+import { useState, useEffect } from "react";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useEnhancedPortfolio } from "@/hooks/useEnhancedPortfolio";
 import PortfolioChart from "@/components/PortfolioChart";
+import { PortfolioWithName } from "@/types";
+import PortfolioSkeleton from "@/components/skeletons/PortfolioSkeleton";
+
+const screenWidth = Dimensions.get("window").width;
 
 export default function PortfolioScreen() {
-  const { data: portfolio = [], isLoading, error } = useEnhancedPortfolio();
+  const {
+    data: portfolioData = [],
+    isLoading: isDataLoading,
+    error,
+  } = useEnhancedPortfolio();
+  const [portfolio, setPortfolio] = useState<PortfolioWithName[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (isDataLoading) return;
+
+    // retraso artificial de 1 segundo para ver el skeleton
+    const timer = setTimeout(() => {
+      setPortfolio(portfolioData);
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [portfolioData, isDataLoading]);
 
   if (isLoading) {
-    return (
-      <ThemedView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" />
-      </ThemedView>
-    );
+    return <PortfolioSkeleton />;
   }
 
   if (error) {
