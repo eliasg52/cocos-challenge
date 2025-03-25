@@ -16,7 +16,8 @@ import { ThemedView } from "@/components/ThemedView";
 import OrderInfo from "@/components/OrderInfo";
 import { useOrderForm } from "@/hooks/useOrderForm";
 import { formatCurrency } from "@/utils";
-import OrderSkeleton from "@/components/skeletons/OrderSkeleton";
+import OrderConfirmation from "@/components/OrderConfirmation";
+import { OrderStatus } from "@/types";
 
 export default function CreateOrderScreen() {
   const router = useRouter();
@@ -72,12 +73,12 @@ export default function CreateOrderScreen() {
         contentContainerStyle={styles.scrollViewContent}
       >
         {isSuccess && response ? (
-          <OrderSkeleton
+          <OrderConfirmation
             name={name as string}
             ticker={ticker as string}
             price={formatCurrency(Number(last_price))}
             orderId={response.id.toString()}
-            status={response.status as "PENDING" | "FILLED" | "REJECTED"}
+            status={response.status as OrderStatus}
             onCreateNewOrder={resetForm}
             onCancel={handleCancel}
           />
@@ -371,18 +372,20 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#007AFF",
-    borderRadius: 10,
     paddingVertical: 12,
-    alignItems: "center",
-    marginTop: 8,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    flex: 1,
+    marginHorizontal: 8,
   },
   buttonDisabled: {
     backgroundColor: "#B5B5B5",
   },
   buttonText: {
     color: "white",
-    fontWeight: "600",
     fontSize: 16,
+    fontWeight: "500",
+    textAlign: "center",
   },
   responseCard: {
     margin: 16,
@@ -442,5 +445,19 @@ const styles = StyleSheet.create({
     color: "#666",
     fontWeight: "500",
     fontSize: 16,
+  },
+  successText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 16,
+  },
+  secondaryButton: {
+    backgroundColor: "#f5f5f5",
   },
 });

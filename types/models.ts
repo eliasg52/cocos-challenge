@@ -31,5 +31,17 @@ export type Order = {
 
 export type OrderResponse = {
   id: string;
-  status: "PENDING" | "REJECTED" | "FILLED";
+  status: OrderStatus;
+};
+
+export type OrderStatus = "PENDING" | "FILLED" | "REJECTED";
+
+export type CreateOrderOptions = {
+  onSuccess?: (data: OrderResponse) => void;
+  onError?: (error: Error) => void;
+  instrumentData?: {
+    name?: string;
+    ticker?: string;
+    price?: string;
+  };
 };

@@ -1,46 +1,29 @@
-import React from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "react-native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { OrderConfirmationProps, OrderStatus } from "@/types";
 
-type OrderSkeletonProps = {
-  name?: string;
-  ticker?: string;
-  price?: string;
-  orderId?: string;
-  status?: "PENDING" | "FILLED" | "REJECTED";
-  onCreateNewOrder?: () => void;
-  onCancel?: () => void;
-};
-
-/**
- * Un skeleton mejorado para la pantalla de órdenes pendientes
- */
-const OrderSkeleton = ({
-  name = "Capex S.A.",
-  ticker = "CAPX",
-  price = "$ 53,68",
-  orderId = "213395",
-  status = "PENDING",
+const OrderConfirmation = ({
+  name,
+  ticker,
+  price,
+  orderId,
+  status,
   onCreateNewOrder,
   onCancel,
-}: OrderSkeletonProps) => {
+}: OrderConfirmationProps) => {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
 
-  // Determinar el color del estado según el status
   const getStatusColor = () => {
-    switch (status) {
+    switch (status as OrderStatus) {
       case "FILLED":
-        return "#4CAF50"; // Verde
+        return "#4CAF50";
       case "PENDING":
-        return "#FF9800"; // Naranja
+        return "#FF9800";
       case "REJECTED":
-        return "#F44336"; // Rojo
+        return "#F44336";
       default:
         return "#FF9800";
     }
@@ -60,40 +43,55 @@ const OrderSkeleton = ({
     }
   };
 
+  const handleViewHistory = () => {
+    if (onCancel) {
+      onCancel();
+    } else {
+      router.back();
+    }
+
+    setTimeout(() => {
+      router.replace("/(tabs)/history");
+    }, 100);
+  };
+
   return (
     <ThemedView style={styles.container}>
-      {/* Botón X para cerrar en la esquina superior derecha sin fondo */}
       <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
         <Text style={styles.closeButtonText}>✕</Text>
       </TouchableOpacity>
 
-      {/* Layout mejorado para evitar espacio vacío */}
       <View style={styles.contentContainer}>
-        {/* Información del instrumento */}
         <View style={styles.instrumentInfoContainer}>
           <ThemedText style={styles.name}>{name}</ThemedText>
           <ThemedText style={styles.ticker}>{ticker}</ThemedText>
           <ThemedText style={styles.price}>Last Price: {price}</ThemedText>
         </View>
-
-        {/* Información de la orden */}
         <View style={styles.orderContainer}>
           <ThemedText style={styles.orderId}>ID: {orderId}</ThemedText>
           <ThemedText style={[styles.orderStatus, { color: getStatusColor() }]}>
             Status: {status}
           </ThemedText>
 
-          {/* Botón para crear nueva orden con tamaño más pequeño */}
+          <ThemedText style={styles.successMessage}>
+            Order placed successfully!
+          </ThemedText>
           <TouchableOpacity
             style={styles.createButton}
             onPress={handleCreateNewOrder}
           >
             <ThemedText style={styles.buttonText}>Create New Order</ThemedText>
           </TouchableOpacity>
-
-          {/* Botón para cancelar y cerrar el modal */}
+          <TouchableOpacity
+            style={styles.historyButton}
+            onPress={handleViewHistory}
+          >
+            <ThemedText style={styles.historyButtonText}>
+              View Order History
+            </ThemedText>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-            <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+            <ThemedText style={styles.cancelButtonText}>Close</ThemedText>
           </TouchableOpacity>
         </View>
       </View>
@@ -107,7 +105,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
-    paddingBottom: 0, // Elimina el padding inferior
+    paddingBottom: 0,
   },
   closeButton: {
     position: "absolute",
@@ -118,7 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 10, // Para asegurar que esté sobre otros elementos
+    zIndex: 10,
   },
   closeButtonText: {
     fontSize: 18,
@@ -160,7 +158,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
-    marginBottom: 20, // Añade margen inferior al contenedor
+    marginBottom: 20,
   },
   orderId: {
     fontSize: 18,
@@ -169,38 +167,59 @@ const styles = StyleSheet.create({
   orderStatus: {
     fontSize: 20,
     fontWeight: "500",
-    marginBottom: 30,
-    color: "#FF3B30", // Rojo por defecto para REJECTED
+    marginBottom: 16,
+    color: "#FF3B30",
+  },
+  successMessage: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#34C759",
+    marginBottom: 24,
+    textAlign: "center",
   },
   createButton: {
-    backgroundColor: "#3B82F6", // Azul
-    paddingVertical: 12, // Padding más pequeño
-    paddingHorizontal: 24, // Padding más pequeño
+    backgroundColor: "#3B82F6",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: "center",
-    width: "80%", // Ancho reducido
-    marginBottom: 12, // Espacio para el botón de cancelar
+    width: "80%",
+    marginBottom: 12,
   },
   buttonText: {
     color: "white",
-    fontSize: 16, // Tamaño de texto más pequeño
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  historyButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: "center",
+    width: "80%",
+    marginBottom: 12,
+  },
+  historyButtonText: {
+    color: "white",
+    fontSize: 16,
     fontWeight: "600",
   },
   cancelButton: {
-    backgroundColor: "#f5f5f5", // Gris claro
-    paddingVertical: 12, // Padding más pequeño
-    paddingHorizontal: 24, // Padding más pequeño
+    backgroundColor: "#f5f5f5",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: "center",
-    width: "80%", // Ancho reducido
+    width: "80%",
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },
   cancelButtonText: {
     color: "#666",
-    fontSize: 16, // Tamaño de texto más pequeño
+    fontSize: 16,
     fontWeight: "500",
   },
 });
 
-export default OrderSkeleton;
+export default OrderConfirmation;

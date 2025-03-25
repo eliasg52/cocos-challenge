@@ -1,20 +1,28 @@
 import { useMutation } from "@tanstack/react-query";
-import { Order, OrderResponse } from "@/types";
+import { Order, OrderResponse, CreateOrderOptions } from "@/types";
 import tradingApi from "@/api/tradingApi";
-
-interface CreateOrderOptions {
-  onSuccess?: (data: OrderResponse) => void;
-  onError?: (error: Error) => void;
-}
+import { useOrderHistoryStore } from "@/store/orderStore";
+import { useLocalSearchParams } from "expo-router";
 
 export function useCreateOrder(options?: CreateOrderOptions) {
-  const { onSuccess, onError } = options || {};
+  const { onSuccess, onError, instrumentData } = options || {};
+  const addOrder = useOrderHistoryStore((state) => state.addOrder);
+  const params = useLocalSearchParams<{
+    name?: string;
+    ticker?: string;
+    last_price?: string;
+  }>();
 
   const mutation = useMutation({
     mutationFn: async (orderData: Order): Promise<OrderResponse> => {
       return tradingApi.createOrder(orderData);
     },
     onSuccess: (data) => {
+      addOrder(data, {
+        instrumentName: instrumentData?.name || params?.name,
+        ticker: instrumentData?.ticker || params?.ticker,
+        price: instrumentData?.price || params?.last_price,
+      });
       onSuccess?.(data);
     },
     onError: (error: Error) => {

@@ -1,4 +1,4 @@
-import { Instrument } from "./instrument";
+import { Instrument } from "./models";
 
 export type SearchBarProps = {
   value: string;
