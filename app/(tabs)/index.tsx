@@ -1,4 +1,10 @@
-import { StyleSheet, FlatList, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  View,
+  TouchableOpacity,
+  Image,
+} from "react-native";
 import { useRouter } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
@@ -42,7 +48,13 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Trading</ThemedText>
+      <ThemedView style={styles.header}>
+        <Image
+          source={require("@/assets/icons/androidIcon.png")}
+          style={styles.logo}
+        />
+        <ThemedText style={styles.title}>Cocos Challenge</ThemedText>
+      </ThemedView>
 
       <SearchBar
         value={searchQuery}
@@ -115,8 +127,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    padding: 16,
-    textAlign: "center",
+    marginLeft: -10,
   },
   list: {
     width: "100%",
@@ -187,5 +198,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ffcccc",
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginLeft: 5,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
