@@ -14,48 +14,41 @@ interface PortfolioChartProps {
   portfolio: PortfolioWithName[];
 }
 
-// Dimensiones para el gráfico
 const screenWidth = Dimensions.get("window").width;
-const chartSize = 220; // Tamaño fijo para el gráfico
+const chartWidth = screenWidth;
 
 const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
-  // Filtrar entradas con valor de mercado > 0
   const portfolioWithValue = portfolio.filter(
     (item) => item.quantity * item.last_price > 0
   );
 
-  // No mostrar nada si no hay datos
   if (portfolioWithValue.length === 0) {
     return null;
   }
 
-  // Calcular valor total del portfolio
   const totalValue = portfolioWithValue.reduce(
     (sum, item) => sum + item.quantity * item.last_price,
     0
   );
 
-  // Calcular ganancia total
   const totalProfit = portfolioWithValue.reduce((acc, item) => {
     const { profit } = calculatePortfolioItemDetails(item);
     return acc + profit;
   }, 0);
 
-  // Definir colores para el gráfico
   const colors = [
-    "#FF6384", // Rosa
-    "#36A2EB", // Azul
-    "#FFCE56", // Amarillo
-    "#4BC0C0", // Verde agua
-    "#9966FF", // Morado
-    "#FF9F40", // Naranja
-    "#5AD3D1", // Turquesa
-    "#FFC154", // Ámbar
-    "#A288E3", // Lavanda
-    "#FF8A80", // Rojo claro
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+    "#5AD3D1",
+    "#FFC154",
+    "#A288E3",
+    "#FF8A80",
   ];
 
-  // Preparar datos para el gráfico
   const chartData = portfolioWithValue.map((item, index) => {
     const {
       totalValue: marketValue,
@@ -72,21 +65,19 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
       marketValue: marketValue,
       profit: profit,
       profitPercentage: profitPercentage,
-      population: marketValue, // La librería usa "population" como valor numérico
+      population: marketValue,
       color: colors[index % colors.length],
       legendFontColor: "#333",
       legendFontSize: 12,
     };
   });
 
-  // Configurar el gráfico
   const chartConfig = {
-    backgroundGradientFrom: "transparent",
-    backgroundGradientTo: "transparent",
+    backgroundGradientFrom: "#F2F2F7",
+    backgroundGradientTo: "#F2F2F7",
     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
     strokeWidth: 2,
-    useShadowColorFromDataset: false,
-    decimalPlaces: 0,
   };
 
   return (
@@ -102,24 +93,24 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
         </ThemedText>
       </View>
 
-      <View style={styles.chartContainer}>
+      <View style={styles.chartWrapper}>
         <PieChart
           data={chartData}
-          width={screenWidth}
-          height={chartSize}
+          width={chartWidth}
+          height={270}
           chartConfig={chartConfig}
           accessor="population"
           backgroundColor="transparent"
-          paddingLeft="0"
+          paddingLeft="30"
           absolute={false}
-          hasLegend={false}
+          hasLegend={true}
         />
       </View>
 
       {/* Leyenda personalizada con información completa */}
       <View style={styles.legendOuterContainer}>
         <ScrollView style={styles.legendContainer}>
-          <View style={styles.legendList}>
+          <View>
             {chartData.map((item, index) => (
               <View key={index} style={styles.legendItem}>
                 <View style={styles.legendHeader}>
@@ -206,7 +197,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F2F2F7",
   },
   summaryContainer: {
-    marginBottom: 10,
+    marginBottom: 20,
     alignItems: "center",
   },
   subtitle: {
@@ -215,21 +206,22 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#666",
   },
-  chartContainer: {
+  chartWrapper: {
     alignItems: "center",
     justifyContent: "center",
-    height: chartSize,
-    marginVertical: 10,
+    height: 200,
+    marginVertical: 20,
+    marginHorizontal: 20,
+    width: "100%",
   },
   legendOuterContainer: {
     flex: 1,
-    marginTop: 5,
+    marginTop: 10,
   },
   legendContainer: {
     flex: 1,
-    marginBottom: 60, // Espacio adicional al final para asegurar scroll completo
+    marginBottom: 50,
   },
-  legendList: {},
   legendItem: {
     backgroundColor: "white",
     padding: 12,
