@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Alert } from "react-native";
-import { Order } from "@/types";
 import { useCreateOrder } from "./useCreateOrder";
-import { validateOrder, prepareOrderData } from "@/utils";
+import { prepareOrderData } from "@/utils";
 
 interface OrderFormParams {
   id?: string;
@@ -14,14 +13,12 @@ interface OrderFormParams {
 export function useOrderForm(params: OrderFormParams) {
   const { id, last_price } = params;
 
-  // Form state
   const [side, setSide] = useState<"BUY" | "SELL">("BUY");
   const [orderType, setOrderType] = useState<"MARKET" | "LIMIT">("MARKET");
   const [quantity, setQuantity] = useState<string>("");
   const [price, setPrice] = useState<string>(last_price || "");
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
 
-  // Order submission hook
   const {
     createOrder,
     isLoading: isSubmitting,
@@ -36,7 +33,6 @@ export function useOrderForm(params: OrderFormParams) {
     },
   });
 
-  // Calculate quantity based on investment amount
   useEffect(() => {
     if (investmentAmount && last_price) {
       const calculatedQuantity = Math.floor(
@@ -46,7 +42,6 @@ export function useOrderForm(params: OrderFormParams) {
     }
   }, [investmentAmount, last_price]);
 
-  // Handle form submission
   const handleSubmit = () => {
     if (!id || !quantity || (orderType === "LIMIT" && !price)) {
       Alert.alert("Error", "Please fill in all required fields");
@@ -64,7 +59,6 @@ export function useOrderForm(params: OrderFormParams) {
     createOrder(orderData);
   };
 
-  // Reset form to initial state
   const resetForm = () => {
     setSide("BUY");
     setOrderType("MARKET");
@@ -74,33 +68,28 @@ export function useOrderForm(params: OrderFormParams) {
     resetOrderState();
   };
 
-  // Handle investment amount change
   const handleInvestmentAmountChange = (text: string) => {
     setInvestmentAmount(text);
   };
 
-  // Handle quantity change
   const handleQuantityChange = (text: string) => {
     setQuantity(text);
     setInvestmentAmount("");
   };
 
   return {
-    // Form state
     side,
     orderType,
     quantity,
     price,
     investmentAmount,
 
-    // Form actions
     setSide,
     setOrderType,
     setPrice,
     handleQuantityChange,
     handleInvestmentAmountChange,
 
-    // Submission state and actions
     isSubmitting,
     isSuccess,
     isError,

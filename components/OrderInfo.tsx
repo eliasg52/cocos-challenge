@@ -11,7 +11,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 
-// Habilitar LayoutAnimation en Android
 if (Platform.OS === "android") {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);

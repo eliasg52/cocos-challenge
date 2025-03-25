@@ -8,8 +8,6 @@ import PortfolioChart from "@/components/PortfolioChart";
 import { PortfolioWithName } from "@/types";
 import PortfolioSkeleton from "@/components/skeletons/PortfolioSkeleton";
 
-const screenWidth = Dimensions.get("window").width;
-
 export default function PortfolioScreen() {
   const {
     data: portfolioData = [],

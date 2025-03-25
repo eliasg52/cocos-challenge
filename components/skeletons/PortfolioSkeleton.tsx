@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  useColorScheme,
-} from "react-native";
+import { View, StyleSheet, ScrollView, useColorScheme } from "react-native";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 
 import { ThemedText } from "@/components/ThemedText";
