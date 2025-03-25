@@ -8,6 +8,7 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
+import Octicons from "@expo/vector-icons/Octicons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -45,6 +46,15 @@ export default function TabLayout() {
           title: "Portfolio",
           tabBarIcon: ({ color }) => (
             <Entypo name="suitcase" size={26} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: "Orders History",
+          tabBarIcon: ({ color }) => (
+            <Octicons name="history" size={26} color={color} />
           ),
         }}
       />
