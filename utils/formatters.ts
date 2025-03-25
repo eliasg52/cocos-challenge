@@ -1,9 +1,3 @@
-/**
- * Calcula el porcentaje de retorno entre el último precio y el precio de cierre
- * @param lastPrice - Último precio del instrumento
- * @param closePrice - Precio de cierre del instrumento
- * @returns Porcentaje de retorno formateado con 2 decimales
- */
 export const calculateReturn = (
   lastPrice: number,
   closePrice: number
@@ -14,12 +8,6 @@ export const calculateReturn = (
   return `${returnPercentage.toFixed(2)}%`;
 };
 
-/**
- * Formatea un valor monetario con el símbolo de moneda
- * @param value - Valor monetario a formatear
- * @param currency - Código de moneda (default ARS - pesos argentinos)
- * @returns Valor formateado como string
- */
 export const formatCurrency = (
   value: number,
   currency: string = "ARS"
@@ -31,12 +19,6 @@ export const formatCurrency = (
   }).format(value);
 };
 
-/**
- * Determina si un retorno es positivo, negativo o neutro
- * @param lastPrice - Último precio del instrumento
- * @param closePrice - Precio de cierre del instrumento
- * @returns 'positive' | 'negative' | 'neutral'
- */
 export const getReturnType = (
   lastPrice: number,
   closePrice: number

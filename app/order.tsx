@@ -7,16 +7,19 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  Text,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import OrderInfo from "@/components/OrderInfo";
 import { useOrderForm } from "@/hooks/useOrderForm";
 import { formatCurrency } from "@/utils";
+import OrderSkeleton from "@/components/skeletons/OrderSkeleton";
 
 export default function CreateOrderScreen() {
+  const router = useRouter();
   const params = useLocalSearchParams<{
     id: string;
     name: string;
@@ -51,47 +54,43 @@ export default function CreateOrderScreen() {
     resetForm,
   } = useOrderForm(params);
 
+  const handleCancel = () => {
+    router.back();
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <ScrollView style={styles.scrollView}>
-        <ThemedView style={styles.card}>
-          <ThemedText style={styles.instrumentName}>{name}</ThemedText>
-          <ThemedText style={styles.ticker}>{ticker}</ThemedText>
-          <ThemedText style={styles.price}>
-            Last Price: {formatCurrency(Number(last_price))}
-          </ThemedText>
-        </ThemedView>
+      <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
+        <Text style={styles.closeButtonText}>✕</Text>
+      </TouchableOpacity>
 
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+      >
         {isSuccess && response ? (
-          <ThemedView style={styles.responseCard}>
-            <ThemedText style={styles.responseTitle}>
-              Order {response.status}
-            </ThemedText>
-            <ThemedText style={styles.responseId}>ID: {response.id}</ThemedText>
-            <ThemedText
-              style={[
-                styles.responseStatus,
-                response.status === "FILLED"
-                  ? styles.statusFilled
-                  : response.status === "PENDING"
-                  ? styles.statusPending
-                  : styles.statusRejected,
-              ]}
-            >
-              Status: {response.status}
-            </ThemedText>
-
-            <TouchableOpacity style={styles.button} onPress={resetForm}>
-              <ThemedText style={styles.buttonText}>
-                Create New Order
-              </ThemedText>
-            </TouchableOpacity>
-          </ThemedView>
+          <OrderSkeleton
+            name={name as string}
+            ticker={ticker as string}
+            price={formatCurrency(Number(last_price))}
+            orderId={response.id.toString()}
+            status={response.status as "PENDING" | "FILLED" | "REJECTED"}
+            onCreateNewOrder={resetForm}
+            onCancel={handleCancel}
+          />
         ) : (
           <>
+            <ThemedView style={styles.card}>
+              <ThemedText style={styles.instrumentName}>{name}</ThemedText>
+              <ThemedText style={styles.ticker}>{ticker}</ThemedText>
+              <ThemedText style={styles.price}>
+                Last Price: {formatCurrency(Number(last_price))}
+              </ThemedText>
+            </ThemedView>
+
             <ThemedView style={styles.formCard}>
               <View style={styles.segmentContainer}>
                 <ThemedText style={styles.label}>Side</ThemedText>
@@ -241,6 +240,13 @@ export default function CreateOrderScreen() {
                   </ThemedText>
                 )}
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={handleCancel}
+              >
+                <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+              </TouchableOpacity>
             </ThemedView>
 
             <OrderInfo />
@@ -258,10 +264,24 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
+  scrollViewContent: {
+    paddingBottom: 20,
+  },
   closeButton: {
-    fontSize: 16,
-    color: "#007AFF",
-    fontWeight: "600",
+    position: "absolute",
+    top: 24,
+    right: 24,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#666",
   },
   card: {
     margin: 16,
@@ -285,6 +305,7 @@ const styles = StyleSheet.create({
   },
   formCard: {
     margin: 16,
+    marginBottom: 20,
     padding: 16,
     borderRadius: 12,
     backgroundColor: "#F2F2F7",
@@ -385,13 +406,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   statusFilled: {
-    color: "#34C759", // Green
+    color: "#34C759",
   },
   statusPending: {
-    color: "#FF9500", // Orange
+    color: "#FF9500",
   },
   statusRejected: {
-    color: "#FF3B30", // Red
+    color: "#FF3B30",
   },
   errorContainer: {
     marginBottom: 16,
@@ -405,5 +426,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FF3B30",
     textAlign: "center",
+  },
+  cancelButton: {
+    backgroundColor: "#f5f5f5",
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    width: "100%",
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  cancelButtonText: {
+    color: "#666",
+    fontWeight: "500",
+    fontSize: 16,
   },
 });

@@ -1,10 +1,5 @@
 import { Order } from "@/types";
 
-/**
- * Valida la información de una orden antes de enviarla
- * @param order - Datos de la orden a validar
- * @returns Objeto con el resultado de la validación
- */
 export const validateOrder = (
   order: Partial<Order>
 ): { isValid: boolean; errorMessage?: string } => {
@@ -23,12 +18,6 @@ export const validateOrder = (
   return { isValid: true };
 };
 
-/**
- * Calcula la cantidad de acciones basado en un monto y precio
- * @param amount - Monto a invertir
- * @param price - Precio por acción
- * @returns Cantidad de acciones (redondeado hacia abajo)
- */
 export const calculateQuantityFromAmount = (
   amount: number,
   price: number
@@ -37,12 +26,6 @@ export const calculateQuantityFromAmount = (
   return Math.floor(amount / price);
 };
 
-/**
- * Calcula el monto total de una orden
- * @param quantity - Cantidad de acciones
- * @param price - Precio por acción
- * @returns Monto total de la orden
- */
 export const calculateOrderAmount = (
   quantity: number,
   price: number
@@ -51,11 +34,6 @@ export const calculateOrderAmount = (
   return quantity * price;
 };
 
-/**
- * Obtiene el estilo según el estado de la orden
- * @param status - Estado de la orden (FILLED, PENDING, REJECTED)
- * @returns Nombre del estilo correspondiente al estado
- */
 export const getOrderStatusStyle = (
   status: "FILLED" | "PENDING" | "REJECTED" | string
 ): "statusFilled" | "statusPending" | "statusRejected" => {
@@ -64,11 +42,6 @@ export const getOrderStatusStyle = (
   return "statusRejected";
 };
 
-/**
- * Prepara los datos de la orden para enviarla al servidor
- * @param orderData - Datos parciales de la orden
- * @returns Objeto con los datos completos y formateados de la orden
- */
 export const prepareOrderData = (orderData: {
   instrument_id: string | number;
   side: "BUY" | "SELL";
