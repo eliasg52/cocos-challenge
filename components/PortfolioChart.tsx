@@ -83,13 +83,16 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
   return (
     <ThemedView style={styles.container}>
       <View style={styles.summaryContainer}>
-        <ThemedText style={styles.subtitle}>
-          Total Value: {formatCurrency(totalValue)}
+        <ThemedText style={styles.totalValueTitle}>Total Value:</ThemedText>
+        <ThemedText style={styles.totalValueAmount}>
+          {formatCurrency(totalValue)}
         </ThemedText>
+
+        <ThemedText style={styles.totalProfitTitle}>Total Profit:</ThemedText>
         <ThemedText
-          style={[styles.subtitle, styles[getValueType(totalProfit)]]}
+          style={[styles.totalProfitAmount, styles[getValueType(totalProfit)]]}
         >
-          Total Profit: {formatCurrency(totalProfit)}
+          {formatCurrency(totalProfit)}
         </ThemedText>
       </View>
 
@@ -199,12 +202,39 @@ const styles = StyleSheet.create({
   summaryContainer: {
     marginBottom: 20,
     alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  subtitle: {
-    fontSize: 16,
+  totalValueTitle: {
+    fontSize: 18,
     textAlign: "center",
-    marginBottom: 4,
+    marginBottom: 8,
     color: "#666",
+    fontWeight: "500",
+  },
+  totalValueAmount: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 16,
+  },
+  totalProfitTitle: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 8,
+    color: "#666",
+    fontWeight: "500",
+  },
+  totalProfitAmount: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 8,
   },
   chartWrapper: {
     alignItems: "center",
@@ -274,13 +304,16 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   positive: {
-    color: "green",
+    color: "#4CAF50",
+    fontWeight: "bold",
   },
   negative: {
-    color: "red",
+    color: "#FF3B30",
+    fontWeight: "bold",
   },
   neutral: {
     color: "#888",
+    fontWeight: "500",
   },
 });
 
