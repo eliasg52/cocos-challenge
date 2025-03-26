@@ -1,4 +1,4 @@
-import { OrderStatus } from "./models";
+import { OrderStatus, PortfolioWithName } from "./models";
 
 export type OrderConfirmationProps = {
   name?: string;
@@ -14,3 +14,7 @@ export type StatusStyleTypes =
   | "statusFilled"
   | "statusPending"
   | "statusRejected";
+
+export type PortfolioChartProps = {
+  portfolio: PortfolioWithName[];
+};

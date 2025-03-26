@@ -8,35 +8,50 @@
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splashIcon.png",
+      "imageWidth": 200,
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
     "ios": {
       "supportsTablet": true,
       "icon": "./assets/icons/iosIcon.png",
-      "bundleIdentifier": "com.eliasg52.cocoschallenge"
+      "bundleIdentifier": "com.eliasg52.cocoschallenge",
+      "splash": {
+        "image": "./assets/splashIcon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#FFFFFF",
+        "darkMode": {
+          "image": "./assets/splashIcon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#121212"
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/androidIcon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.eliasg52.cocoschallenge"
+      "package": "com.eliasg52.cocoschallenge",
+      "splash": {
+        "image": "./assets/splashIcon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#FFFFFF",
+        "darkMode": {
+          "image": "./assets/splashIcon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#121212"
+        }
+      }
     },
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/splashIcon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
-        }
-      ]
-    ],
+    "plugins": ["expo-router", "expo-splash-screen"],
     "experiments": {
       "typedRoutes": true
     }

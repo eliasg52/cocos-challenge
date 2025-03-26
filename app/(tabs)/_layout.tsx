@@ -1,16 +1,15 @@
 import { Tabs } from "expo-router";
-import { Platform, StyleSheet } from "react-native";
+import { Platform } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import TabBarBackgroundIos from "@/components/ui/TabBarBackground.ios";
 import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useTheme } from "@/hooks/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const primaryColor = Colors[colorScheme ?? "light"].tint;
   const backgroundColor = Colors[colorScheme ?? "light"].background;
   const borderColor = Colors[colorScheme ?? "light"].border;

@@ -29,7 +29,6 @@ export function ThemedText({
 
   let textColor = color;
 
-  // Adjust color based on type
   if (type === "secondary") {
     textColor = secondaryColor;
   } else if (type === "link") {

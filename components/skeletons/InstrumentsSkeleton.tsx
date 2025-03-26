@@ -1,16 +1,21 @@
-import { View, StyleSheet, ScrollView, useColorScheme } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import ContentLoader, { Rect } from "react-content-loader/native";
 import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/hooks/ThemeContext";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const InstrumentItemSkeleton = () => {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const isDark = colorScheme === "dark";
 
+  const cardBackgroundColor = useThemeColor({}, "card");
   const backgroundColor = isDark ? "#2c2c2c" : "#ececec";
   const foregroundColor = isDark ? "#3d3d3d" : "#dddddd";
 
   return (
-    <ThemedView style={styles.instrumentItem}>
+    <ThemedView
+      style={[styles.instrumentItem, { backgroundColor: cardBackgroundColor }]}
+    >
       <View style={styles.instrumentHeader}>
         <View style={styles.instrumentLogoName}>
           <View>
@@ -90,7 +95,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   instrumentItem: {
-    backgroundColor: "white",
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,

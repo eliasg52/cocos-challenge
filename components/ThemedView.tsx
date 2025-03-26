@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
   },
   cardAndroid: {
     elevation: 2,
-    // Ajustes específicos para Android para mejorar apariencia
     borderWidth: 0,
   },
 });

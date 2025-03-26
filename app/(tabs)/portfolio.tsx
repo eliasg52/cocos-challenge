@@ -26,7 +26,6 @@ export default function PortfolioScreen() {
   useEffect(() => {
     if (isDataLoading) return;
 
-    // retraso artificial de 1 segundo para ver el skeleton
     const timer = setTimeout(() => {
       setPortfolio(portfolioData);
       setIsLoading(false);
@@ -106,7 +105,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 10,
-    paddingBottom: 30,
+    paddingBottom: 120,
   },
   centered: {
     justifyContent: "center",

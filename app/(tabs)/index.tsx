@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -16,10 +16,12 @@ import { ThemedCard } from "@/components/ThemedCard";
 import SearchBar from "@/components/SearchBar";
 import useSearchTicker from "@/hooks/useSearchTicker";
 import { useInstruments } from "@/hooks/useInstruments";
+import { useFilteredInstruments } from "@/hooks/useFilteredInstruments";
 import { Instrument } from "@/types";
 import { calculateReturn, formatCurrency, getReturnType } from "@/utils";
 import InstrumentsSkeleton from "@/components/skeletons/InstrumentsSkeleton";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { useTheme } from "@/hooks/ThemeContext";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -39,22 +41,15 @@ export default function HomeScreen() {
 
   const [refreshing, setRefreshing] = useState(false);
 
+  const { colorScheme, toggleTheme } = useTheme();
+
   const positiveColor = useThemeColor({}, "positive");
   const negativeColor = useThemeColor({}, "negative");
   const neutralColor = useThemeColor({}, "neutral");
   const tintColor = useThemeColor({}, "tint");
 
-  // Filtrar instrumentos que no sean de tipo "MONEDA"
-  const instruments = useMemo(() => {
-    if (!instrumentsData) return [];
-    return instrumentsData.filter((instrument) => instrument.type !== "MONEDA");
-  }, [instrumentsData]);
-
-  // Aplicar el mismo filtro a los resultados de búsqueda
-  const filteredSearchResults = useMemo(() => {
-    if (!searchResults) return [];
-    return searchResults.filter((instrument) => instrument.type !== "MONEDA");
-  }, [searchResults]);
+  const instruments = useFilteredInstruments(instrumentsData);
+  const filteredSearchResults = useFilteredInstruments(searchResults);
 
   const displayData = searchQuery ? filteredSearchResults : instruments;
   const error = instrumentsError || (searchQuery ? searchError : null);
@@ -85,13 +80,22 @@ export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
-        <Image
-          source={require("@/assets/icons/androidIcon.png")}
-          style={styles.logo}
-        />
-        <ThemedText type="title" style={styles.title}>
-          Cocos Capital
-        </ThemedText>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("@/assets/icons/androidIcon.png")}
+            style={styles.logo}
+          />
+          <ThemedText type="title" style={styles.title}>
+            Cocos Capital
+          </ThemedText>
+        </View>
+        <TouchableOpacity onPress={toggleTheme} style={styles.themeToggle}>
+          <Ionicons
+            name={colorScheme === "dark" ? "sunny" : "moon"}
+            size={24}
+            color={tintColor}
+          />
+        </TouchableOpacity>
       </ThemedView>
 
       <SearchBar
@@ -215,9 +219,9 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-
     paddingTop: 8,
     paddingBottom: 8,
+    paddingHorizontal: 0,
   },
   logo: {
     width: 80,
@@ -249,42 +253,51 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   ticker: {
-    fontSize: 14,
+    marginBottom: 2,
   },
   priceInfo: {
     alignItems: "flex-end",
   },
   price: {
-    marginBottom: 4,
+    marginBottom: 2,
   },
   changeContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
+  change: {
+    fontSize: 12,
+  },
   trendIcon: {
     marginRight: 4,
   },
-  change: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  emptyContainer: {
-    padding: 24,
-    alignItems: "center",
-  },
-  emptyText: {
-    fontSize: 16,
-    textAlign: "center",
-  },
   errorContainer: {
-    marginHorizontal: 16,
-    marginTop: 8,
-    marginBottom: 8,
-    padding: 12,
+    margin: 16,
+    padding: 16,
+    borderRadius: 8,
   },
   errorText: {
-    fontSize: 16,
+    fontSize: 14,
     color: "red",
     textAlign: "center",
+  },
+  emptyContainer: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyText: {
+    textAlign: "center",
+    fontSize: 16,
+  },
+  themeToggle: {
+    marginLeft: "auto",
+    marginRight: 10,
+    padding: 8,
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
   },
 });

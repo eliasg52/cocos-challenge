@@ -2,21 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Alert } from "react-native";
 import { useCreateOrder } from "./useCreateOrder";
 import { prepareOrderData } from "@/utils";
-
-interface OrderFormParams {
-  id?: string;
-  name?: string;
-  ticker?: string;
-  last_price?: string;
-}
-
-interface ValidationResult {
-  isValid: boolean;
-  errors: { [key: string]: string };
-}
-
-// Tipo para el modo de entrada
-type InputMode = "quantity" | "investment";
+import { OrderFormParams, ValidationResult, InputMode } from "@/types";
 
 export function useOrderForm(params: OrderFormParams) {
   const { id, last_price } = params;
@@ -27,10 +13,8 @@ export function useOrderForm(params: OrderFormParams) {
   const [price, setPrice] = useState<string>(last_price || "");
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
 
-  // Estado para controlar qué campo está activo (quantity o investment)
   const [inputMode, setInputMode] = useState<InputMode>("quantity");
 
-  // Validation states
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [touched, setTouched] = useState<{ [key: string]: boolean }>({
     quantity: false,
@@ -52,7 +36,6 @@ export function useOrderForm(params: OrderFormParams) {
     },
   });
 
-  // Calculate shares in real-time based on investment amount
   const calculatedShares = useMemo(() => {
     if (
       !investmentAmount ||
@@ -65,7 +48,6 @@ export function useOrderForm(params: OrderFormParams) {
     return Math.floor(Number(investmentAmount) / Number(last_price));
   }, [investmentAmount, last_price]);
 
-  // Calculate investment amount in real-time based on quantity
   const calculatedInvestment = useMemo(() => {
     if (
       !quantity ||
@@ -78,7 +60,6 @@ export function useOrderForm(params: OrderFormParams) {
     return Number(quantity) * Number(last_price);
   }, [quantity, last_price]);
 
-  // Actualizar la cantidad cuando cambia el monto de inversión
   useEffect(() => {
     if (
       inputMode === "investment" &&
@@ -94,7 +75,6 @@ export function useOrderForm(params: OrderFormParams) {
     }
   }, [investmentAmount, last_price, inputMode]);
 
-  // Actualizar el monto de inversión cuando cambia la cantidad
   useEffect(() => {
     if (
       inputMode === "quantity" &&
@@ -110,11 +90,9 @@ export function useOrderForm(params: OrderFormParams) {
     }
   }, [quantity, last_price, inputMode]);
 
-  // Validate form fields
   const validateForm = (): ValidationResult => {
     const newErrors: { [key: string]: string } = {};
 
-    // Validate quantity
     if (!quantity) {
       newErrors.quantity = "Quantity is required";
     } else if (isNaN(Number(quantity))) {
@@ -125,7 +103,6 @@ export function useOrderForm(params: OrderFormParams) {
       newErrors.quantity = "Quantity must be a whole number";
     }
 
-    // Validate price for LIMIT orders
     if (orderType === "LIMIT") {
       if (!price) {
         newErrors.price = "Limit price is required";
@@ -136,7 +113,6 @@ export function useOrderForm(params: OrderFormParams) {
       }
     }
 
-    // Update errors state
     setErrors(newErrors);
 
     return {
@@ -145,7 +121,6 @@ export function useOrderForm(params: OrderFormParams) {
     };
   };
 
-  // Validate fields when values change
   useEffect(() => {
     if (touched.quantity || touched.price || touched.investmentAmount) {
       validateForm();
@@ -153,7 +128,6 @@ export function useOrderForm(params: OrderFormParams) {
   }, [quantity, price, investmentAmount, orderType, touched]);
 
   const handleSubmit = () => {
-    // Mark all fields as touched to show validation errors
     setTouched({
       quantity: true,
       price: true,
@@ -201,19 +175,15 @@ export function useOrderForm(params: OrderFormParams) {
   };
 
   const handleInvestmentAmountChange = (text: string) => {
-    // Cambiar al modo de inversión
     setInputMode("investment");
     setInvestmentAmount(text);
     setTouched((prev) => ({ ...prev, investmentAmount: true }));
-    // La cantidad se actualizará automáticamente por el efecto
   };
 
   const handleQuantityChange = (text: string) => {
-    // Cambiar al modo de cantidad
     setInputMode("quantity");
     setQuantity(text);
     setTouched((prev) => ({ ...prev, quantity: true }));
-    // El monto de inversión se actualizará automáticamente por el efecto
   };
 
   const handlePriceChange = (text: string) => {
@@ -221,7 +191,6 @@ export function useOrderForm(params: OrderFormParams) {
     setTouched((prev) => ({ ...prev, price: true }));
   };
 
-  // Cambiar explícitamente el modo de entrada
   const setInputModeExplicitly = (mode: InputMode) => {
     setInputMode(mode);
   };

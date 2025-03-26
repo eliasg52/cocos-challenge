@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
-import { ThemedView } from "./ThemedView";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import { ThemedCard } from "./ThemedCard";
 
 if (Platform.OS === "android") {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -19,6 +20,11 @@ if (Platform.OS === "android") {
 
 const OrderInfo: React.FC = () => {
   const [expanded, setExpanded] = useState(false);
+  const tintColor = useThemeColor({}, "tint");
+  const borderColor = useThemeColor({}, "border");
+  const positiveColor = useThemeColor({}, "positive");
+  const accentColor = useThemeColor({}, "accent");
+  const negativeColor = useThemeColor({}, "negative");
 
   const toggleExpand = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -26,20 +32,25 @@ const OrderInfo: React.FC = () => {
   };
 
   return (
-    <ThemedView
+    <ThemedCard
       style={[styles.container, expanded && styles.expandedContainer]}
+      elevated
     >
       <TouchableOpacity
-        style={[styles.header, expanded && styles.expandedHeader]}
+        style={[
+          styles.header,
+          expanded && styles.expandedHeader,
+          { borderBottomColor: borderColor },
+        ]}
         onPress={toggleExpand}
         activeOpacity={0.7}
       >
         <View style={styles.titleContainer}>
           <ThemedText style={styles.title}>Order Information</ThemedText>
           <Ionicons
-            name={expanded ? "chevron-up" : "information-circle"}
-            size={expanded ? 22 : 24}
-            color="#007AFF"
+            name={expanded ? "chevron-up" : "chevron-down"}
+            size={24}
+            color={tintColor}
           />
         </View>
       </TouchableOpacity>
@@ -48,39 +59,45 @@ const OrderInfo: React.FC = () => {
         <View style={styles.content}>
           <ThemedText style={styles.sectionTitle}>Order Types:</ThemedText>
           <ThemedText style={styles.text}>
-            <ThemedText style={styles.bold}>MARKET:</ThemedText> Orders executed
-            immediately at the current market price.
+            <ThemedText type="defaultSemiBold">MARKET:</ThemedText> Orders
+            executed immediately at the current market price.
           </ThemedText>
           <ThemedText style={styles.text}>
-            <ThemedText style={styles.bold}>LIMIT:</ThemedText> Orders executed
-            only at the specified price or better.
+            <ThemedText type="defaultSemiBold">LIMIT:</ThemedText> Orders
+            executed only at the specified price or better.
           </ThemedText>
 
           <ThemedText style={styles.sectionTitle}>Order Status:</ThemedText>
           <View style={styles.statusRow}>
-            <View style={[styles.statusDot, styles.statusFilledDot]} />
+            <View
+              style={[styles.statusDot, { backgroundColor: positiveColor }]}
+            />
             <ThemedText style={styles.text}>
-              <ThemedText style={styles.bold}>FILLED:</ThemedText> Order has
+              <ThemedText type="defaultSemiBold">FILLED:</ThemedText> Order has
               been executed. All MARKET orders are executed immediately.
             </ThemedText>
           </View>
           <View style={styles.statusRow}>
-            <View style={[styles.statusDot, styles.statusPendingDot]} />
+            <View
+              style={[styles.statusDot, { backgroundColor: accentColor }]}
+            />
             <ThemedText style={styles.text}>
-              <ThemedText style={styles.bold}>PENDING:</ThemedText> LIMIT orders
-              waiting to be executed at the specified price.
+              <ThemedText type="defaultSemiBold">PENDING:</ThemedText> LIMIT
+              orders waiting to be executed at the specified price.
             </ThemedText>
           </View>
           <View style={styles.statusRow}>
-            <View style={[styles.statusDot, styles.statusRejectedDot]} />
+            <View
+              style={[styles.statusDot, { backgroundColor: negativeColor }]}
+            />
             <ThemedText style={styles.text}>
-              <ThemedText style={styles.bold}>REJECTED:</ThemedText> Order has
-              been rejected due to insufficient funds or other reasons.
+              <ThemedText type="defaultSemiBold">REJECTED:</ThemedText> Order
+              has been rejected due to insufficient funds or other reasons.
             </ThemedText>
           </View>
         </View>
       )}
-    </ThemedView>
+    </ThemedCard>
   );
 };
 
@@ -89,7 +106,6 @@ const styles = StyleSheet.create({
     margin: 16,
     padding: 0,
     borderRadius: 12,
-    backgroundColor: "#F2F2F7",
     overflow: "hidden",
     marginBottom: 16,
   },
@@ -99,7 +115,6 @@ const styles = StyleSheet.create({
   header: {
     padding: 16,
     borderBottomWidth: 0,
-    borderBottomColor: "#E5E5EA",
   },
   expandedHeader: {
     borderBottomWidth: 1,
@@ -112,7 +127,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#1C1C1E",
   },
   content: {
     padding: 16,
@@ -123,17 +137,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 12,
     marginBottom: 6,
-    color: "#1C1C1E",
   },
   text: {
     fontSize: 14,
-    color: "#3A3A3C",
     marginBottom: 6,
     lineHeight: 20,
-  },
-  bold: {
-    fontWeight: "600",
-    color: "#1C1C1E",
   },
   statusRow: {
     flexDirection: "row",
@@ -145,15 +153,6 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     marginRight: 8,
-  },
-  statusFilledDot: {
-    backgroundColor: "#34C759", // Green
-  },
-  statusPendingDot: {
-    backgroundColor: "#FF9500", // Orange
-  },
-  statusRejectedDot: {
-    backgroundColor: "#FF3B30", // Red
   },
 });
 

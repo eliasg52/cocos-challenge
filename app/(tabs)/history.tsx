@@ -6,11 +6,9 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from "react-native";
-import {
-  useOrderHistoryStore,
-  EnhancedOrderResponse,
-} from "@/store/orderStore";
-import { getOrderStatusStyle } from "@/utils";
+import { useOrderHistoryStore } from "@/store/orderStore";
+import { formatCurrency } from "@/utils";
+import { EnhancedOrderResponse } from "@/types";
 import { useState, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -18,7 +16,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedCard } from "@/components/ThemedCard";
 import { ThemedButton } from "@/components/ThemedButton";
-import { useThemeColor } from "@/hooks/useThemeColor";
+import { useOrderStyles } from "@/hooks/useOrderStyles";
 
 export default function OrdersHistoryScreen() {
   const orders = useOrderHistoryStore((state) => state.orders);
@@ -27,10 +25,8 @@ export default function OrdersHistoryScreen() {
   const [isClearing, setIsClearing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const accentColor = useThemeColor({}, "accent");
-  const negativeColor = useThemeColor({}, "negative");
-  const tintColor = useThemeColor({}, "tint");
-  const textColor = useThemeColor({}, "text");
+  const { getStatusColor, getSideColor, getSideText, tintColor, borderColor } =
+    useOrderStyles();
 
   const handleClearHistory = () => {
     Alert.alert(
@@ -60,69 +56,126 @@ export default function OrdersHistoryScreen() {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
 
-    // Simula una actualización después de un breve delay
     setTimeout(() => {
-      // Aquí normalmente haríamos un refetch o actualización
-      // Como no hay una función de refetch en el store, solo simulamos el proceso
       setRefreshing(false);
     }, 1000);
   }, []);
 
-  const getStatusColor = (status: string) => {
-    const style = getOrderStatusStyle(status);
-    if (style === "statusFilled") return tintColor;
-    if (style === "statusPending") return accentColor;
-    if (style === "statusRejected") return negativeColor;
-    return textColor;
-  };
+  const renderOrderItem = ({ item }: { item: EnhancedOrderResponse }) => {
+    const timestamp = item.timestamp
+      ? item.timestamp
+        ? item.timestamp
+        : new Date(item.timestamp)
+      : new Date();
 
-  const renderOrderItem = ({ item }: { item: EnhancedOrderResponse }) => (
-    <ThemedCard style={styles.orderItem} elevated>
-      <View style={styles.orderHeader}>
-        <ThemedText type="defaultSemiBold" style={styles.orderId}>
-          Order #{item.id}
-        </ThemedText>
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: `${getStatusColor(item.status)}20` }, // 20 hex for 12% opacity
-          ]}
-        >
-          <ThemedText
-            style={[styles.statusText, { color: getStatusColor(item.status) }]}
+    return (
+      <ThemedCard style={styles.orderItem} elevated>
+        <View style={styles.orderHeader}>
+          <ThemedText type="defaultSemiBold" style={styles.orderId}>
+            Order #{item.id}
+          </ThemedText>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: `${getStatusColor(item.status)}20` },
+            ]}
           >
-            {item.status}
+            <ThemedText
+              style={[
+                styles.statusText,
+                { color: getStatusColor(item.status) },
+              ]}
+            >
+              {item.status}
+            </ThemedText>
+          </View>
+        </View>
+
+        {item.instrumentName && (
+          <View style={styles.instrumentInfo}>
+            <ThemedText type="defaultSemiBold" style={styles.instrumentName}>
+              {item.instrumentName}
+            </ThemedText>
+            {item.ticker && (
+              <ThemedText type="secondary" style={styles.instrumentTicker}>
+                {item.ticker}
+              </ThemedText>
+            )}
+
+            <View style={styles.orderDetailRow}>
+              {item.price && (
+                <ThemedText style={styles.instrumentPrice}>
+                  Price: {item.price}
+                </ThemedText>
+              )}
+
+              {item.side && (
+                <View
+                  style={[
+                    styles.sideBadge,
+                    { backgroundColor: `${getSideColor(item.side)}20` },
+                  ]}
+                >
+                  <ThemedText
+                    style={[
+                      styles.sideText,
+                      { color: getSideColor(item.side) },
+                    ]}
+                  >
+                    {item.side}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.orderDetailsGrid}>
+              {item.type && (
+                <View style={styles.detailItem}>
+                  <ThemedText type="secondary" style={styles.detailLabel}>
+                    Type:
+                  </ThemedText>
+                  <ThemedText style={styles.detailValue}>
+                    {item.type}
+                  </ThemedText>
+                </View>
+              )}
+
+              {item.quantity && (
+                <View style={styles.detailItem}>
+                  <ThemedText type="secondary" style={styles.detailLabel}>
+                    Quantity:
+                  </ThemedText>
+                  <ThemedText style={styles.detailValue}>
+                    {item.quantity}
+                  </ThemedText>
+                </View>
+              )}
+
+              {item.quantity && item.price && (
+                <View style={styles.detailItem}>
+                  <ThemedText type="secondary" style={styles.detailLabel}>
+                    Total:
+                  </ThemedText>
+                  <ThemedText style={styles.detailValue}>
+                    {formatCurrency(
+                      item.quantity *
+                        parseFloat(item.price.replace(/[^0-9.-]+/g, ""))
+                    )}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        <View style={[styles.orderDetails, { borderTopColor: borderColor }]}>
+          <ThemedText type="secondary" style={styles.orderDetail}>
+            {timestamp.toLocaleString()}
           </ThemedText>
         </View>
-      </View>
-
-      {item.instrumentName && (
-        <View style={styles.instrumentInfo}>
-          <ThemedText type="defaultSemiBold" style={styles.instrumentName}>
-            {item.instrumentName}
-          </ThemedText>
-          {item.ticker && (
-            <ThemedText type="secondary" style={styles.instrumentTicker}>
-              {item.ticker}
-            </ThemedText>
-          )}
-          {item.price && (
-            <ThemedText style={styles.instrumentPrice}>
-              Price: {item.price}
-            </ThemedText>
-          )}
-        </View>
-      )}
-
-      <View style={styles.orderDetails}>
-        <ThemedText type="secondary" style={styles.orderDetail}>
-          {item.timestamp
-            ? item.timestamp.toLocaleString()
-            : new Date().toLocaleString()}
-        </ThemedText>
-      </View>
-    </ThemedCard>
-  );
+      </ThemedCard>
+    );
+  };
 
   return (
     <ThemedView style={styles.container}>
@@ -150,7 +203,7 @@ export default function OrdersHistoryScreen() {
                 <Ionicons
                   name="trash-outline"
                   size={16}
-                  color={negativeColor}
+                  color={getSideColor("SELL")}
                 />
               }
             />
@@ -160,7 +213,7 @@ export default function OrdersHistoryScreen() {
             contentContainerStyle={styles.listContent}
             data={orders}
             renderItem={renderOrderItem}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
@@ -177,8 +230,8 @@ export default function OrdersHistoryScreen() {
         <ThemedCard elevated style={styles.emptyContainer}>
           <Ionicons
             name="receipt-outline"
-            size={48}
-            color={textColor}
+            size={42}
+            color={getSideText("SELL")}
             style={styles.emptyIcon}
           />
           <ThemedText type="subtitle" style={styles.emptyText}>
@@ -196,6 +249,7 @@ export default function OrdersHistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 10,
   },
   title: {
     marginTop: 16,
@@ -239,6 +293,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
+  sideBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  sideText: {
+    fontSize: 11,
+    fontWeight: "600",
+  },
   instrumentInfo: {
     marginBottom: 12,
   },
@@ -249,15 +312,57 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   instrumentPrice: {
+    marginBottom: 4,
+    flex: 1,
+  },
+  orderDetailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  orderDetailsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 4,
+  },
+  detailItem: {
+    width: "50%",
+    marginBottom: 6,
+  },
+  detailLabel: {
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  detailValue: {
     fontSize: 14,
   },
   orderDetails: {
     borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.05)",
-    paddingTop: 12,
+    paddingTop: 8,
   },
   orderDetail: {
     fontSize: 12,
+  },
+  emptyContainer: {
+    flex: 0.9,
+    margin: 16,
+    marginBottom: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
+  emptyIcon: {
+    marginBottom: 12,
+    opacity: 0.6,
+  },
+  emptyText: {
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    textAlign: "center",
+    fontSize: 14,
   },
   loadingContainer: {
     flex: 1,
@@ -266,24 +371,5 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 16,
-  },
-  emptyContainer: {
-    margin: 16,
-    padding: 32,
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: 200,
-  },
-  emptyIcon: {
-    marginBottom: 16,
-    opacity: 0.7,
-  },
-  emptyText: {
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    textAlign: "center",
   },
 });

@@ -32,10 +32,7 @@ export function ThemedButton({
 }: ThemedButtonProps) {
   const primaryColor = useThemeColor({}, "tint");
   const accentColor = useThemeColor({}, "accent");
-  const textColor = useThemeColor({}, "text");
-  const backgroundColor = useThemeColor({}, "background");
 
-  // Determine background color based on variant
   let bgColor;
   let txtColor;
   let borderColor;
@@ -63,7 +60,6 @@ export function ThemedButton({
       break;
   }
 
-  // Adjust styles based on size
   let buttonStyle;
   let textStyle;
 
@@ -82,10 +78,7 @@ export function ThemedButton({
       break;
   }
 
-  // Apply opacity if disabled
   const opacityStyle = disabled ? { opacity: 0.6 } : {};
-
-  // Specific styling for Android outline variant
   const isOutlineAndroid = Platform.OS === "android" && variant === "outline";
 
   return (

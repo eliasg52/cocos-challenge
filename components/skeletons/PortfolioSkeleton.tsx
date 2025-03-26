@@ -1,20 +1,29 @@
 import React from "react";
-import { View, StyleSheet, ScrollView, useColorScheme } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { useTheme } from "@/hooks/ThemeContext";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const PieChartSkeleton = () => {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const isDark = colorScheme === "dark";
 
+  const cardBackgroundColor = useThemeColor({}, "card");
+  const borderColor = useThemeColor({}, "border");
   const backgroundColor = isDark ? "#2c2c2c" : "#ececec";
   const foregroundColor = isDark ? "#3d3d3d" : "#dddddd";
 
   return (
     <ThemedView style={styles.chartSkeletonContainer}>
-      <View style={styles.summaryContainer}>
+      <View
+        style={[
+          styles.summaryContainer,
+          { backgroundColor: cardBackgroundColor, borderColor },
+        ]}
+      >
         <ContentLoader
           speed={2}
           width={300}
@@ -30,7 +39,7 @@ const PieChartSkeleton = () => {
 
       <View style={styles.chartWrapper}>
         <View style={styles.pieChartSkeletonContainer}>
-          <View style={styles.pieCircle} />
+          <View style={[styles.pieCircle, { borderColor }]} />
 
           <View style={styles.legendSkeletonContainer}>
             <ContentLoader
@@ -77,14 +86,18 @@ const PieChartSkeleton = () => {
 };
 
 const PortfolioItemSkeleton = ({ index }: { index: number }) => {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useTheme();
   const isDark = colorScheme === "dark";
 
+  const cardBackgroundColor = useThemeColor({}, "card");
+  const borderColor = useThemeColor({}, "border");
   const backgroundColor = isDark ? "#2c2c2c" : "#ececec";
   const foregroundColor = isDark ? "#3d3d3d" : "#dddddd";
 
   return (
-    <ThemedView style={styles.legendItem}>
+    <ThemedView
+      style={[styles.legendItem, { backgroundColor: cardBackgroundColor }]}
+    >
       <View style={styles.cardHeader}>
         <View style={styles.tickerContainer}>
           <View
@@ -115,7 +128,7 @@ const PortfolioItemSkeleton = ({ index }: { index: number }) => {
         </ContentLoader>
       </View>
 
-      <View style={styles.cardDivider} />
+      <View style={[styles.cardDivider, { backgroundColor: borderColor }]} />
 
       <View style={styles.cardBody}>
         <View style={styles.detailRow}>
@@ -251,87 +264,79 @@ const styles = StyleSheet.create({
     padding: 16,
     textAlign: "center",
   },
-  // Estilos para los skeletons
   chartSkeletonContainer: {
-    margin: 16,
     padding: 16,
-    borderRadius: 12,
-    backgroundColor: "#f9f9f9",
   },
   summaryContainer: {
-    marginBottom: 20,
-    alignItems: "center",
-  },
-  chartWrapper: {
+    borderRadius: 10,
+    padding: 12,
+    marginVertical: 16,
     alignItems: "center",
     justifyContent: "center",
-    marginVertical: 20,
-    marginHorizontal: 0,
+    borderWidth: 1,
+  },
+  chartWrapper: {
+    height: 220,
+    alignItems: "center",
+  },
+  pieChartSkeletonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  pieCircle: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    borderWidth: 1,
+    backgroundColor: "transparent",
+  },
+  legendSkeletonContainer: {
+    flex: 1,
+    marginLeft: 20,
+  },
+  legendOuterContainer: {
+    padding: 16,
   },
   legendItem: {
-    backgroundColor: "white",
-    padding: 16,
-    borderRadius: 14,
-    marginHorizontal: 16,
+    borderRadius: 10,
     marginBottom: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 2,
   },
   cardHeader: {
     flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
+    alignItems: "center",
+    padding: 12,
   },
   tickerContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
   colorIndicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    marginRight: 12,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    marginRight: 8,
   },
   cardDivider: {
     height: 1,
-    backgroundColor: "#ebebeb",
-    marginVertical: 10,
+    width: "100%",
   },
   cardBody: {
-    marginTop: 10,
+    padding: 12,
   },
   detailRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  legendOuterContainer: {
-    marginTop: 10,
-    paddingHorizontal: 16,
-  },
-  pieChartSkeletonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    width: "100%",
-  },
-  pieCircle: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: "#e9e9e9",
-    position: "relative",
-    overflow: "hidden",
-  },
-  legendSkeletonContainer: {
-    marginLeft: 10,
+    marginVertical: 6,
   },
 });
 
-export { PortfolioSkeleton, PieChartSkeleton, PortfolioItemSkeleton };
+export { PortfolioSkeleton };
 export default PortfolioSkeleton;

@@ -3,6 +3,7 @@ import { Order, OrderResponse, CreateOrderOptions } from "@/types";
 import tradingApi from "@/api/tradingApi";
 import { useOrderHistoryStore } from "@/store/orderStore";
 import { useLocalSearchParams } from "expo-router";
+import { formatCurrency } from "@/utils";
 
 export function useCreateOrder(options?: CreateOrderOptions) {
   const { onSuccess, onError, instrumentData } = options || {};
@@ -17,11 +18,16 @@ export function useCreateOrder(options?: CreateOrderOptions) {
     mutationFn: async (orderData: Order): Promise<OrderResponse> => {
       return tradingApi.createOrder(orderData);
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       addOrder(data, {
         instrumentName: instrumentData?.name || params?.name,
         ticker: instrumentData?.ticker || params?.ticker,
-        price: instrumentData?.price || params?.last_price,
+        price: params?.last_price
+          ? formatCurrency(Number(params.last_price))
+          : instrumentData?.price,
+        quantity: variables.quantity,
+        type: variables.type,
+        side: variables.side,
       });
       onSuccess?.(data);
     },

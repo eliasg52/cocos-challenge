@@ -3,21 +3,22 @@ import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { PieChart } from "react-native-chart-kit";
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
-import { PortfolioWithName } from "@/types";
-import {
-  formatCurrency,
-  calculatePortfolioItemDetails,
-  getValueType,
-} from "@/utils";
-
-interface PortfolioChartProps {
-  portfolio: PortfolioWithName[];
-}
+import { ThemedCard } from "./ThemedCard";
+import { PortfolioChartProps } from "@/types";
+import { formatCurrency, calculatePortfolioItemDetails } from "@/utils";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const screenWidth = Dimensions.get("window").width;
 const chartWidth = screenWidth;
 
 const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const borderColor = useThemeColor({}, "border");
+  const positiveColor = useThemeColor({}, "positive");
+  const negativeColor = useThemeColor({}, "negative");
+  const neutralColor = useThemeColor({}, "neutral");
+
   const portfolioWithValue = portfolio.filter(
     (item) => item.quantity * item.last_price > 0
   );
@@ -67,22 +68,30 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
       profitPercentage: profitPercentage,
       population: marketValue,
       color: colors[index % colors.length],
-      legendFontColor: "#333",
+      legendFontColor: textColor,
       legendFontSize: 12,
     };
   });
 
   const chartConfig = {
-    backgroundGradientFrom: "#F2F2F7",
-    backgroundGradientTo: "#F2F2F7",
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    backgroundGradientFrom: backgroundColor,
+    backgroundGradientTo: backgroundColor,
+    color: (opacity = 1) => {
+      return textColor === "#FFFFFF"
+        ? `rgba(255, 255, 255, ${opacity})`
+        : `rgba(0, 0, 0, ${opacity})`;
+    },
+    labelColor: (opacity = 1) => {
+      return textColor === "#FFFFFF"
+        ? `rgba(255, 255, 255, ${opacity})`
+        : `rgba(0, 0, 0, ${opacity})`;
+    },
     strokeWidth: 2,
   };
 
   return (
     <ThemedView style={styles.container}>
-      <View style={styles.summaryContainer}>
+      <ThemedCard style={styles.summaryContainer} elevated>
         <ThemedText style={styles.totalValueTitle}>Total Value:</ThemedText>
         <ThemedText style={styles.totalValueAmount}>
           {formatCurrency(totalValue)}
@@ -90,11 +99,21 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
 
         <ThemedText style={styles.totalProfitTitle}>Total Profit:</ThemedText>
         <ThemedText
-          style={[styles.totalProfitAmount, styles[getValueType(totalProfit)]]}
+          style={[
+            styles.totalProfitAmount,
+            {
+              color:
+                totalProfit > 0
+                  ? positiveColor
+                  : totalProfit < 0
+                  ? negativeColor
+                  : neutralColor,
+            },
+          ]}
         >
           {formatCurrency(totalProfit)}
         </ThemedText>
-      </View>
+      </ThemedCard>
 
       <View style={styles.chartWrapper}>
         <PieChart
@@ -110,13 +129,17 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
         />
       </View>
 
-      {/* Leyenda personalizada con información completa */}
       <View style={styles.legendOuterContainer}>
         <ScrollView style={styles.legendContainer}>
           <View>
             {chartData.map((item, index) => (
-              <View key={index} style={styles.legendItem}>
-                <View style={styles.legendHeader}>
+              <ThemedCard key={index} style={styles.legendItem} elevated>
+                <View
+                  style={[
+                    styles.legendHeader,
+                    { borderBottomColor: borderColor },
+                  ]}
+                >
                   <View
                     style={[
                       styles.colorIndicator,
@@ -157,11 +180,14 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
                     <ThemedText
                       style={[
                         styles.detailValue,
-                        item.profit > 0
-                          ? styles.positive
-                          : item.profit < 0
-                          ? styles.negative
-                          : styles.neutral,
+                        {
+                          color:
+                            item.profit > 0
+                              ? positiveColor
+                              : item.profit < 0
+                              ? negativeColor
+                              : neutralColor,
+                        },
                       ]}
                     >
                       {formatCurrency(item.profit)}
@@ -173,18 +199,21 @@ const PortfolioChart: React.FC<PortfolioChartProps> = ({ portfolio }) => {
                     <ThemedText
                       style={[
                         styles.detailValue,
-                        item.profitPercentage > 0
-                          ? styles.positive
-                          : item.profitPercentage < 0
-                          ? styles.negative
-                          : styles.neutral,
+                        {
+                          color:
+                            item.profitPercentage > 0
+                              ? positiveColor
+                              : item.profitPercentage < 0
+                              ? negativeColor
+                              : neutralColor,
+                        },
                       ]}
                     >
                       {item.profitPercentage.toFixed(2)}%
                     </ThemedText>
                   </View>
                 </View>
-              </View>
+              </ThemedCard>
             ))}
           </View>
         </ScrollView>
@@ -197,38 +226,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#F2F2F7",
   },
   summaryContainer: {
     marginBottom: 20,
     alignItems: "center",
-    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   totalValueTitle: {
     fontSize: 18,
     textAlign: "center",
     marginBottom: 8,
-    color: "#666",
     fontWeight: "500",
   },
   totalValueAmount: {
     fontSize: 20,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 16,
   },
   totalProfitTitle: {
     fontSize: 18,
     textAlign: "center",
     marginBottom: 8,
-    color: "#666",
     fontWeight: "500",
   },
   totalProfitAmount: {
@@ -253,22 +272,15 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   legendItem: {
-    backgroundColor: "white",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
   },
   legendHeader: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
     paddingBottom: 8,
   },
   colorIndicator: {
@@ -285,7 +297,6 @@ const styles = StyleSheet.create({
   legendPercentage: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#666",
   },
   legendDetails: {
     marginTop: 4,
@@ -297,22 +308,9 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 14,
-    color: "#666",
   },
   detailValue: {
     fontSize: 14,
-    fontWeight: "500",
-  },
-  positive: {
-    color: "#4CAF50",
-    fontWeight: "bold",
-  },
-  negative: {
-    color: "#FF3B30",
-    fontWeight: "bold",
-  },
-  neutral: {
-    color: "#888",
     fontWeight: "500",
   },
 });

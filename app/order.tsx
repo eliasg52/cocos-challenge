@@ -3,8 +3,6 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  ActivityIndicator,
-  KeyboardAvoidingView,
   Platform,
   TextInput,
 } from "react-native";
@@ -34,13 +32,10 @@ export default function CreateOrderScreen() {
   const { name, ticker, last_price } = params;
 
   const primaryColor = useThemeColor({}, "tint");
-  const accentColor = useThemeColor({}, "accent");
   const textColor = useThemeColor({}, "text");
   const secondaryTextColor = useThemeColor({}, "secondaryText");
   const backgroundColor = useThemeColor({}, "background");
-  const cardColor = useThemeColor({}, "card");
   const inputColor = useThemeColor({}, "input");
-  const borderColor = useThemeColor({}, "border");
   const inputBorderColor = useThemeColor({}, "inputBorder");
   const errorColor = useThemeColor({}, "negative");
   const positiveColor = useThemeColor({}, "positive");
@@ -79,7 +74,6 @@ export default function CreateOrderScreen() {
     router.back();
   };
 
-  // Determine if input container should show error styling
   const getInputContainerStyle = (fieldName: string) => {
     return [
       styles.textInputContainer,
@@ -256,7 +250,6 @@ export default function CreateOrderScreen() {
                 </View>
               </View>
 
-              {/* Selector de modo de entrada */}
               <View style={styles.segmentContainer}>
                 <ThemedText type="subtitle" style={styles.label}>
                   Input Mode
@@ -323,7 +316,6 @@ export default function CreateOrderScreen() {
                 </View>
               </View>
 
-              {/* Campo de cantidad */}
               <View style={styles.inputContainer}>
                 <View style={styles.inputHeaderContainer}>
                   <ThemedText type="subtitle" style={styles.label}>
@@ -364,7 +356,6 @@ export default function CreateOrderScreen() {
                 ) : null}
               </View>
 
-              {/* Campo de monto de inversión */}
               <View style={styles.inputContainer}>
                 <View style={styles.inputHeaderContainer}>
                   <ThemedText type="subtitle" style={styles.label}>
@@ -448,49 +439,51 @@ export default function CreateOrderScreen() {
                 </ThemedView>
               )}
 
-              <View style={styles.summaryContainer}>
-                <ThemedText type="subtitle">Order Summary</ThemedText>
-                <View style={styles.summaryItem}>
-                  <ThemedText type="secondary">Action:</ThemedText>
-                  <ThemedText
-                    style={{
-                      color: side === "BUY" ? positiveColor : errorColor,
-                      fontWeight: "600",
-                    }}
-                  >
-                    {side === "BUY" ? "Buy" : "Sell"}
-                  </ThemedText>
-                </View>
-                <View style={styles.summaryItem}>
-                  <ThemedText type="secondary">Order Type:</ThemedText>
-                  <ThemedText>
-                    {orderType === "MARKET" ? "Market" : "Limit"}
-                  </ThemedText>
-                </View>
-                {orderType === "LIMIT" && price && (
+              <ThemedCard style={styles.summaryContainer} elevated>
+                <View style={styles.summaryContent}>
+                  <ThemedText type="subtitle">Order Summary</ThemedText>
                   <View style={styles.summaryItem}>
-                    <ThemedText type="secondary">Limit Price:</ThemedText>
-                    <ThemedText>{formatCurrency(Number(price))}</ThemedText>
-                  </View>
-                )}
-                {quantity && (
-                  <View style={styles.summaryItem}>
-                    <ThemedText type="secondary">Quantity:</ThemedText>
-                    <ThemedText>{quantity} shares</ThemedText>
-                  </View>
-                )}
-                {quantity && (
-                  <View style={styles.summaryItem}>
-                    <ThemedText type="secondary">Total Value:</ThemedText>
-                    <ThemedText type="defaultSemiBold">
-                      {formatCurrency(
-                        Number(quantity) *
-                          Number(orderType === "LIMIT" ? price : last_price)
-                      )}
+                    <ThemedText type="secondary">Action:</ThemedText>
+                    <ThemedText
+                      style={{
+                        color: side === "BUY" ? positiveColor : errorColor,
+                        fontWeight: "600",
+                      }}
+                    >
+                      {side === "BUY" ? "Buy" : "Sell"}
                     </ThemedText>
                   </View>
-                )}
-              </View>
+                  <View style={styles.summaryItem}>
+                    <ThemedText type="secondary">Order Type:</ThemedText>
+                    <ThemedText>
+                      {orderType === "MARKET" ? "Market" : "Limit"}
+                    </ThemedText>
+                  </View>
+                  {orderType === "LIMIT" && price && (
+                    <View style={styles.summaryItem}>
+                      <ThemedText type="secondary">Limit Price:</ThemedText>
+                      <ThemedText>{formatCurrency(Number(price))}</ThemedText>
+                    </View>
+                  )}
+                  {quantity && (
+                    <View style={styles.summaryItem}>
+                      <ThemedText type="secondary">Quantity:</ThemedText>
+                      <ThemedText>{quantity} shares</ThemedText>
+                    </View>
+                  )}
+                  {quantity && (
+                    <View style={styles.summaryItem}>
+                      <ThemedText type="secondary">Total Value:</ThemedText>
+                      <ThemedText type="defaultSemiBold">
+                        {formatCurrency(
+                          Number(quantity) *
+                            Number(orderType === "LIMIT" ? price : last_price)
+                        )}
+                      </ThemedText>
+                    </View>
+                  )}
+                </View>
+              </ThemedCard>
 
               <View style={styles.buttonContainer}>
                 <ThemedButton
@@ -641,13 +634,11 @@ const styles = StyleSheet.create({
   },
   summaryContainer: {
     marginTop: 16,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: Platform.OS === "android" ? "#F5F5F5" : "rgba(0,0,0,0.03)",
+    padding: 0,
     marginBottom: 16,
-    ...(Platform.OS === "android"
-      ? { borderWidth: 1, borderColor: "#E0E0E0" }
-      : {}),
+  },
+  summaryContent: {
+    padding: 16,
   },
   summaryItem: {
     flexDirection: "row",

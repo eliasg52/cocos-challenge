@@ -1,4 +1,3 @@
-import React from "react";
 import {
   StyleSheet,
   ViewProps,
@@ -38,7 +37,11 @@ export function ThemedCard({
       style={[
         styles.card,
         elevated && styles.elevated,
-        elevated && Platform.OS === "android" && styles.elevatedAndroid,
+        elevated &&
+          Platform.OS === "android" && [
+            styles.elevatedAndroid,
+            { backgroundColor },
+          ],
         { borderColor },
         style,
       ]}
@@ -74,7 +77,6 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   elevated: {
-    // Sombras para iOS
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -84,10 +86,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   elevatedAndroid: {
-    // Sombra para Android
     elevation: 4,
-    // Pequeños ajustes para mejorar el aspecto en Android
     borderWidth: 0,
-    backgroundColor: "#FFFFFF",
   },
 });
