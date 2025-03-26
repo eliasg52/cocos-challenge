@@ -1,4 +1,4 @@
-# COCOS CHALLENGE
+# 🥥 COCOS CHALLENGE 🥥
 
 ## Requisitos previos
 
