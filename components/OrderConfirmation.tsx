@@ -1,9 +1,13 @@
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { ThemedCard } from "@/components/ThemedCard";
+import { ThemedButton } from "@/components/ThemedButton";
 import { OrderConfirmationProps, OrderStatus } from "@/types";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const OrderConfirmation = ({
   name,
@@ -16,16 +20,22 @@ const OrderConfirmation = ({
 }: OrderConfirmationProps) => {
   const router = useRouter();
 
+  const tintColor = useThemeColor({}, "tint");
+  const accentColor = useThemeColor({}, "accent");
+  const positiveColor = useThemeColor({}, "positive");
+  const negativeColor = useThemeColor({}, "negative");
+  const secondaryTextColor = useThemeColor({}, "secondaryText");
+
   const getStatusColor = () => {
     switch (status as OrderStatus) {
       case "FILLED":
-        return "#4CAF50";
+        return positiveColor;
       case "PENDING":
-        return "#FF9800";
+        return accentColor;
       case "REJECTED":
-        return "#F44336";
+        return negativeColor;
       default:
-        return "#FF9800";
+        return accentColor;
     }
   };
 
@@ -57,43 +67,67 @@ const OrderConfirmation = ({
 
   return (
     <ThemedView style={styles.container}>
-      <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
-        <Text style={styles.closeButtonText}>✕</Text>
-      </TouchableOpacity>
-
       <View style={styles.contentContainer}>
-        <View style={styles.instrumentInfoContainer}>
-          <ThemedText style={styles.name}>{name}</ThemedText>
-          <ThemedText style={styles.ticker}>{ticker}</ThemedText>
-          <ThemedText style={styles.price}>Last Price: {price}</ThemedText>
-        </View>
-        <View style={styles.orderContainer}>
-          <ThemedText style={styles.orderId}>ID: {orderId}</ThemedText>
-          <ThemedText style={[styles.orderStatus, { color: getStatusColor() }]}>
-            Status: {status}
+        <ThemedCard style={styles.card} elevated>
+          <ThemedText type="subheading" style={styles.name}>
+            {name}
           </ThemedText>
+          <ThemedText type="secondary" style={styles.ticker}>
+            {ticker}
+          </ThemedText>
+          <ThemedText type="defaultSemiBold" style={styles.price}>
+            Last Price: {price}
+          </ThemedText>
+        </ThemedCard>
 
-          <ThemedText style={styles.successMessage}>
+        <ThemedCard style={styles.orderContainer} elevated>
+          <View style={styles.orderHeader}>
+            <ThemedText type="subtitle">Order Information</ThemedText>
+          </View>
+
+          <View style={styles.orderInfo}>
+            <ThemedText style={styles.orderId}>ID: {orderId}</ThemedText>
+            <View
+              style={[
+                styles.statusBadge,
+                { backgroundColor: `${getStatusColor()}20` },
+              ]}
+            >
+              <ThemedText
+                style={[styles.orderStatus, { color: getStatusColor() }]}
+              >
+                {status}
+              </ThemedText>
+            </View>
+          </View>
+
+          <ThemedText type="subtitle" style={styles.successMessage}>
             Order placed successfully!
           </ThemedText>
-          <TouchableOpacity
-            style={styles.createButton}
-            onPress={handleCreateNewOrder}
-          >
-            <ThemedText style={styles.buttonText}>Create New Order</ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.historyButton}
-            onPress={handleViewHistory}
-          >
-            <ThemedText style={styles.historyButtonText}>
-              View Order History
-            </ThemedText>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-            <ThemedText style={styles.cancelButtonText}>Close</ThemedText>
-          </TouchableOpacity>
-        </View>
+
+          <View style={styles.buttonsContainer}>
+            <ThemedButton
+              title="Create New Order"
+              variant="primary"
+              style={styles.button}
+              onPress={handleCreateNewOrder}
+            />
+
+            <ThemedButton
+              title="View Order History"
+              variant="secondary"
+              style={styles.button}
+              onPress={handleViewHistory}
+            />
+
+            <ThemedButton
+              title="Close"
+              variant="outline"
+              style={styles.button}
+              onPress={handleCancel}
+            />
+          </View>
+        </ThemedCard>
       </View>
     </ThemedView>
   );
@@ -106,119 +140,64 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 16,
     paddingBottom: 0,
+    paddingTop: 40,
   },
   closeButton: {
     position: "absolute",
     top: 24,
     right: 24,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 10,
   },
-  closeButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#666",
-  },
-  instrumentInfoContainer: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 12,
+  card: {
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
   },
   name: {
-    fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 8,
   },
   ticker: {
-    fontSize: 18,
-    color: "#666",
     marginBottom: 12,
   },
   price: {
-    fontSize: 18,
-    fontWeight: "500",
+    marginTop: 4,
   },
   orderContainer: {
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 12,
+    marginBottom: 20,
+  },
+  orderHeader: {
+    marginBottom: 16,
+  },
+  orderInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
     marginBottom: 20,
   },
   orderId: {
-    fontSize: 18,
-    marginBottom: 12,
+    fontSize: 16,
+  },
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
   orderStatus: {
-    fontSize: 20,
-    fontWeight: "500",
-    marginBottom: 16,
-    color: "#FF3B30",
+    fontSize: 14,
+    fontWeight: "600",
   },
   successMessage: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#34C759",
     marginBottom: 24,
     textAlign: "center",
   },
-  createButton: {
-    backgroundColor: "#3B82F6",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    width: "80%",
-    marginBottom: 12,
+  buttonsContainer: {
+    gap: 12,
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  historyButton: {
-    backgroundColor: "#4CAF50",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    width: "80%",
-    marginBottom: 12,
-  },
-  historyButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  cancelButton: {
-    backgroundColor: "#f5f5f5",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: "center",
-    width: "80%",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  cancelButtonText: {
-    color: "#666",
-    fontSize: 16,
-    fontWeight: "500",
+  button: {
+    width: "100%",
   },
 });
 

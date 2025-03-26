@@ -2,25 +2,35 @@ import {
   StyleSheet,
   FlatList,
   View,
-  TouchableOpacity,
   Alert,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
 import {
   useOrderHistoryStore,
   EnhancedOrderResponse,
 } from "@/store/orderStore";
 import { getOrderStatusStyle } from "@/utils";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { Ionicons } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { StatusStyleTypes } from "@/types";
+import { ThemedCard } from "@/components/ThemedCard";
+import { ThemedButton } from "@/components/ThemedButton";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 export default function OrdersHistoryScreen() {
   const orders = useOrderHistoryStore((state) => state.orders);
   const clearOrders = useOrderHistoryStore((state) => state.clearOrders);
+
   const [isClearing, setIsClearing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const accentColor = useThemeColor({}, "accent");
+  const negativeColor = useThemeColor({}, "negative");
+  const tintColor = useThemeColor({}, "tint");
+  const textColor = useThemeColor({}, "text");
 
   const handleClearHistory = () => {
     Alert.alert(
@@ -47,27 +57,52 @@ export default function OrdersHistoryScreen() {
     );
   };
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+
+    // Simula una actualización después de un breve delay
+    setTimeout(() => {
+      // Aquí normalmente haríamos un refetch o actualización
+      // Como no hay una función de refetch en el store, solo simulamos el proceso
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
+  const getStatusColor = (status: string) => {
+    const style = getOrderStatusStyle(status);
+    if (style === "statusFilled") return tintColor;
+    if (style === "statusPending") return accentColor;
+    if (style === "statusRejected") return negativeColor;
+    return textColor;
+  };
+
   const renderOrderItem = ({ item }: { item: EnhancedOrderResponse }) => (
-    <ThemedView style={styles.orderItem}>
+    <ThemedCard style={styles.orderItem} elevated>
       <View style={styles.orderHeader}>
-        <ThemedText style={styles.orderId}>Order #{item.id}</ThemedText>
+        <ThemedText type="defaultSemiBold" style={styles.orderId}>
+          Order #{item.id}
+        </ThemedText>
         <View
           style={[
             styles.statusBadge,
-            styles[getOrderStatusStyle(item.status) as StatusStyleTypes],
+            { backgroundColor: `${getStatusColor(item.status)}20` }, // 20 hex for 12% opacity
           ]}
         >
-          <ThemedText style={styles.statusText}>{item.status}</ThemedText>
+          <ThemedText
+            style={[styles.statusText, { color: getStatusColor(item.status) }]}
+          >
+            {item.status}
+          </ThemedText>
         </View>
       </View>
 
       {item.instrumentName && (
         <View style={styles.instrumentInfo}>
-          <ThemedText style={styles.instrumentName}>
+          <ThemedText type="defaultSemiBold" style={styles.instrumentName}>
             {item.instrumentName}
           </ThemedText>
           {item.ticker && (
-            <ThemedText style={styles.instrumentTicker}>
+            <ThemedText type="secondary" style={styles.instrumentTicker}>
               {item.ticker}
             </ThemedText>
           )}
@@ -80,22 +115,24 @@ export default function OrdersHistoryScreen() {
       )}
 
       <View style={styles.orderDetails}>
-        <ThemedText style={styles.orderDetail}>
+        <ThemedText type="secondary" style={styles.orderDetail}>
           {item.timestamp
             ? item.timestamp.toLocaleString()
             : new Date().toLocaleString()}
         </ThemedText>
       </View>
-    </ThemedView>
+    </ThemedCard>
   );
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Orders History</ThemedText>
+      <ThemedText type="heading" style={styles.title}>
+        Orders History
+      </ThemedText>
 
       {isClearing ? (
         <ThemedView style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color={tintColor} />
           <ThemedText style={styles.loadingText}>
             Clearing order history...
           </ThemedText>
@@ -103,14 +140,20 @@ export default function OrdersHistoryScreen() {
       ) : orders.length > 0 ? (
         <>
           <View style={styles.headerContainer}>
-            <TouchableOpacity
+            <ThemedButton
+              title="Clear History"
+              variant="outline"
+              size="small"
               style={styles.clearButton}
               onPress={handleClearHistory}
-            >
-              <ThemedText style={styles.clearButtonText}>
-                Clear History
-              </ThemedText>
-            </TouchableOpacity>
+              leftIcon={
+                <Ionicons
+                  name="trash-outline"
+                  size={16}
+                  color={negativeColor}
+                />
+              }
+            />
           </View>
           <FlatList
             style={styles.list}
@@ -118,17 +161,33 @@ export default function OrdersHistoryScreen() {
             data={orders}
             renderItem={renderOrderItem}
             keyExtractor={(item) => item.id.toString()}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[tintColor]}
+                tintColor={tintColor}
+                title="Refreshing orders..."
+                titleColor={tintColor}
+              />
+            }
           />
         </>
       ) : (
-        <ThemedView style={styles.emptyContainer}>
-          <ThemedText style={styles.emptyText}>
+        <ThemedCard elevated style={styles.emptyContainer}>
+          <Ionicons
+            name="receipt-outline"
+            size={48}
+            color={textColor}
+            style={styles.emptyIcon}
+          />
+          <ThemedText type="subtitle" style={styles.emptyText}>
             No orders in your history yet
           </ThemedText>
-          <ThemedText style={styles.emptySubtext}>
+          <ThemedText type="secondary" style={styles.emptySubtext}>
             Orders you place will appear here
           </ThemedText>
-        </ThemedView>
+        </ThemedCard>
       )}
     </ThemedView>
   );
@@ -139,9 +198,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    padding: 16,
+    marginTop: 16,
+    marginBottom: 0,
     textAlign: "center",
   },
   headerContainer: {
@@ -151,15 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   clearButton: {
-    backgroundColor: "#FF3B30",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-  },
-  clearButtonText: {
-    color: "white",
-    fontWeight: "500",
-    fontSize: 14,
+    marginVertical: 8,
   },
   list: {
     width: "100%",
@@ -170,10 +220,6 @@ const styles = StyleSheet.create({
   },
   orderItem: {
     marginBottom: 12,
-    padding: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "lightgray",
   },
   orderHeader: {
     flexDirection: "row",
@@ -183,80 +229,35 @@ const styles = StyleSheet.create({
   },
   orderId: {
     fontSize: 16,
-    fontWeight: "500",
   },
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 4,
-  },
-  statusFilled: {
-    backgroundColor: "rgba(0, 150, 0, 0.1)",
-  },
-  statusPending: {
-    backgroundColor: "rgba(255, 165, 0, 0.1)",
-  },
-  statusRejected: {
-    backgroundColor: "rgba(255, 0, 0, 0.1)",
+    borderRadius: 8,
   },
   statusText: {
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: "600",
   },
   instrumentInfo: {
     marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
   instrumentName: {
-    fontSize: 14,
-    fontWeight: "600",
+    marginBottom: 4,
   },
   instrumentTicker: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
+    marginBottom: 4,
   },
   instrumentPrice: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: 2,
+    fontSize: 14,
   },
   orderDetails: {
-    marginTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(0,0,0,0.05)",
+    paddingTop: 12,
   },
   orderDetail: {
-    fontSize: 14,
-    color: "#666",
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: "500",
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: "#888",
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  sampleButton: {
-    marginTop: 16,
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  sampleButtonText: {
-    color: "white",
-    fontWeight: "500",
+    fontSize: 12,
   },
   loadingContainer: {
     flex: 1,
@@ -266,6 +267,23 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#666",
+  },
+  emptyContainer: {
+    margin: 16,
+    padding: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 200,
+  },
+  emptyIcon: {
+    marginBottom: 16,
+    opacity: 0.7,
+  },
+  emptyText: {
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    textAlign: "center",
   },
 });

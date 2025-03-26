@@ -1,22 +1,24 @@
 import { Tabs } from "expo-router";
-import { Platform } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 import { HapticTab } from "@/components/HapticTab";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import TabBarBackgroundIos from "@/components/ui/TabBarBackground.ios";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import Entypo from "@expo/vector-icons/Entypo";
-import Octicons from "@expo/vector-icons/Octicons";
+import { useThemeColor } from "@/hooks/useThemeColor";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const primaryColor = Colors[colorScheme ?? "light"].tint;
+  const backgroundColor = Colors[colorScheme ?? "light"].background;
+  const borderColor = Colors[colorScheme ?? "light"].border;
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: primaryColor,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: Platform.select({
@@ -26,8 +28,21 @@ export default function TabLayout() {
         tabBarStyle: Platform.select({
           ios: {
             position: "absolute",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 4,
+            borderTopWidth: 1,
+            borderTopColor: borderColor,
+            backgroundColor,
           },
-          default: {},
+          default: {
+            borderTopWidth: 1,
+            borderTopColor: borderColor,
+            backgroundColor,
+            elevation: 4,
+          },
         }),
       }}
     >
@@ -35,8 +50,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Trading",
-          tabBarIcon: ({ color }) => (
-            <AntDesign name="linechart" size={26} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trending-up" size={size} color={color} />
           ),
         }}
       />
@@ -44,8 +59,8 @@ export default function TabLayout() {
         name="portfolio"
         options={{
           title: "Portfolio",
-          tabBarIcon: ({ color }) => (
-            <Entypo name="suitcase" size={26} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="pie-chart" size={size} color={color} />
           ),
         }}
       />
@@ -53,8 +68,8 @@ export default function TabLayout() {
         name="history"
         options={{
           title: "History",
-          tabBarIcon: ({ color }) => (
-            <Octicons name="history" size={26} color={color} />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="time" size={size} color={color} />
           ),
         }}
       />

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import tradingApi from "@/api/tradingApi";
 import { Instrument, UseSearchTickerResult } from "@/types";
@@ -22,7 +22,7 @@ export const useSearchTicker = (): UseSearchTickerResult => {
   }, [inputValue]);
 
   const {
-    data: searchResults = [],
+    data: searchResultsRaw = [],
     isLoading: isSearching,
     error,
   } = useQuery<Instrument[], Error>({
@@ -33,6 +33,13 @@ export const useSearchTicker = (): UseSearchTickerResult => {
     gcTime: 1000 * 60 * 5,
     retry: 1,
   });
+
+  // Filtrar instrumentos de tipo "MONEDA"
+  const searchResults = useMemo(() => {
+    return searchResultsRaw.filter(
+      (instrument) => instrument.type !== "MONEDA"
+    );
+  }, [searchResultsRaw]);
 
   const handleSearch = useCallback((query: string) => {
     setInputValue(query.toUpperCase());

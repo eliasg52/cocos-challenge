@@ -1,25 +1,63 @@
 import React from "react";
 import { View, TextInput, ActivityIndicator, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { SearchBarProps } from "@/types";
+import { useThemeColor } from "@/hooks/useThemeColor";
 
 const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onSearch,
   isSearching,
 }) => {
+  const inputBgColor = useThemeColor({}, "input");
+  const borderColor = useThemeColor({}, "inputBorder");
+  const textColor = useThemeColor({}, "text");
+  const placeholderColor = useThemeColor({}, "secondaryText");
+  const iconColor = useThemeColor({}, "icon");
+
   return (
-    <View>
-      <View style={styles.searchContainer}>
+    <View style={styles.wrapper}>
+      <View
+        style={[
+          styles.searchContainer,
+          {
+            backgroundColor: inputBgColor,
+            borderColor: borderColor,
+          },
+        ]}
+      >
+        <Ionicons
+          name="search-outline"
+          size={20}
+          color={iconColor}
+          style={styles.searchIcon}
+        />
+
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { color: textColor }]}
           placeholder="Search tickers..."
-          placeholderTextColor="#888"
+          placeholderTextColor={placeholderColor}
           value={value}
           onChangeText={onSearch}
           autoCapitalize="characters"
         />
+
         {isSearching && (
-          <ActivityIndicator size="small" style={styles.searchLoader} />
+          <ActivityIndicator
+            size="small"
+            color={iconColor}
+            style={styles.searchLoader}
+          />
+        )}
+
+        {value && !isSearching && (
+          <Ionicons
+            name="close-circle"
+            size={20}
+            color={iconColor}
+            style={styles.clearIcon}
+            onPress={() => onSearch("")}
+          />
         )}
       </View>
     </View>
@@ -27,23 +65,31 @@ const SearchBar: React.FC<SearchBarProps> = ({
 };
 
 const styles = StyleSheet.create({
-  searchContainer: {
+  wrapper: {
     paddingHorizontal: 16,
     paddingBottom: 8,
+  },
+  searchContainer: {
     flexDirection: "row",
     alignItems: "center",
+    borderRadius: 12,
+    borderWidth: 1,
+    height: 48,
+    paddingHorizontal: 12,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-    padding: 12,
     fontSize: 16,
-    color: "#333",
+    paddingVertical: 8,
   },
   searchLoader: {
-    position: "absolute",
-    right: 32,
+    marginLeft: 8,
+  },
+  clearIcon: {
+    marginLeft: 8,
   },
 });
 
