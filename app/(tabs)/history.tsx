@@ -25,8 +25,14 @@ export default function OrdersHistoryScreen() {
   const [isClearing, setIsClearing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const { getStatusColor, getSideColor, getSideText, tintColor, borderColor } =
-    useOrderStyles();
+  const {
+    getStatusColor,
+    getSideColor,
+    getSideText,
+    tintColor,
+    borderColor,
+    textColor,
+  } = useOrderStyles();
 
   const handleClearHistory = () => {
     Alert.alert(
@@ -231,7 +237,7 @@ export default function OrdersHistoryScreen() {
           <Ionicons
             name="receipt-outline"
             size={42}
-            color={getSideText("SELL")}
+            color={textColor}
             style={styles.emptyIcon}
           />
           <ThemedText type="subtitle" style={styles.emptyText}>
