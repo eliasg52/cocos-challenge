@@ -136,6 +136,7 @@ export default function CreateOrderScreen() {
                   style={[
                     styles.segmentControl,
                     { backgroundColor: inputColor },
+                    Platform.OS === "android" && styles.segmentControlAndroid,
                   ]}
                 >
                   <TouchableOpacity
@@ -144,6 +145,8 @@ export default function CreateOrderScreen() {
                       side === "BUY" && [
                         styles.segmentButtonActive,
                         { backgroundColor: backgroundColor },
+                        Platform.OS === "android" &&
+                          styles.segmentButtonActiveAndroid,
                       ],
                     ]}
                     onPress={() => setSide("BUY")}
@@ -166,6 +169,8 @@ export default function CreateOrderScreen() {
                       side === "SELL" && [
                         styles.segmentButtonActive,
                         { backgroundColor: backgroundColor },
+                        Platform.OS === "android" &&
+                          styles.segmentButtonActiveAndroid,
                       ],
                     ]}
                     onPress={() => setSide("SELL")}
@@ -193,6 +198,7 @@ export default function CreateOrderScreen() {
                   style={[
                     styles.segmentControl,
                     { backgroundColor: inputColor },
+                    Platform.OS === "android" && styles.segmentControlAndroid,
                   ]}
                 >
                   <TouchableOpacity
@@ -201,6 +207,8 @@ export default function CreateOrderScreen() {
                       orderType === "MARKET" && [
                         styles.segmentButtonActive,
                         { backgroundColor: backgroundColor },
+                        Platform.OS === "android" &&
+                          styles.segmentButtonActiveAndroid,
                       ],
                     ]}
                     onPress={() => setOrderType("MARKET")}
@@ -225,6 +233,8 @@ export default function CreateOrderScreen() {
                       orderType === "LIMIT" && [
                         styles.segmentButtonActive,
                         { backgroundColor: backgroundColor },
+                        Platform.OS === "android" &&
+                          styles.segmentButtonActiveAndroid,
                       ],
                     ]}
                     onPress={() => setOrderType("LIMIT")}
@@ -255,6 +265,7 @@ export default function CreateOrderScreen() {
                   style={[
                     styles.segmentControl,
                     { backgroundColor: inputColor },
+                    Platform.OS === "android" && styles.segmentControlAndroid,
                   ]}
                 >
                   <TouchableOpacity
@@ -263,6 +274,8 @@ export default function CreateOrderScreen() {
                       inputMode === "quantity" && [
                         styles.segmentButtonActive,
                         { backgroundColor: backgroundColor },
+                        Platform.OS === "android" &&
+                          styles.segmentButtonActiveAndroid,
                       ],
                     ]}
                     onPress={() => setInputMode("quantity")}
@@ -287,6 +300,8 @@ export default function CreateOrderScreen() {
                       inputMode === "investment" && [
                         styles.segmentButtonActive,
                         { backgroundColor: backgroundColor },
+                        Platform.OS === "android" &&
+                          styles.segmentButtonActiveAndroid,
                       ],
                     ]}
                     onPress={() => setInputMode("investment")}
@@ -481,7 +496,10 @@ export default function CreateOrderScreen() {
                 <ThemedButton
                   title="Submit Order"
                   variant="primary"
-                  style={styles.button}
+                  style={[
+                    styles.button,
+                    Platform.OS === "android" && styles.androidButton,
+                  ]}
                   isLoading={isSubmitting}
                   disabled={
                     isSubmitting || Object.keys(errors).length > 0 || !quantity
@@ -492,7 +510,10 @@ export default function CreateOrderScreen() {
                 <ThemedButton
                   title="Cancel"
                   variant="outline"
-                  style={styles.cancelButton}
+                  style={[
+                    styles.cancelButton,
+                    Platform.OS === "android" && styles.androidCancelButton,
+                  ]}
                   onPress={handleCancel}
                 />
               </View>
@@ -564,6 +585,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
+  segmentControlAndroid: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+  },
   segmentButton: {
     flex: 1,
     paddingVertical: 12,
@@ -583,6 +609,11 @@ const styles = StyleSheet.create({
         elevation: 2,
       },
     }),
+  },
+  segmentButtonActiveAndroid: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
   },
   segmentButtonText: {
     fontWeight: "600",
@@ -612,8 +643,11 @@ const styles = StyleSheet.create({
     marginTop: 16,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: "rgba(0,0,0,0.03)",
+    backgroundColor: Platform.OS === "android" ? "#F5F5F5" : "rgba(0,0,0,0.03)",
     marginBottom: 16,
+    ...(Platform.OS === "android"
+      ? { borderWidth: 1, borderColor: "#E0E0E0" }
+      : {}),
   },
   summaryItem: {
     flexDirection: "row",
@@ -627,8 +661,16 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
   },
+  androidButton: {
+    borderRadius: 8,
+    backgroundColor: "#66BB6A",
+  },
   cancelButton: {
     width: "100%",
+  },
+  androidCancelButton: {
+    borderRadius: 8,
+    borderColor: "#757575",
   },
   errorContainer: {
     marginBottom: 16,

@@ -44,12 +44,12 @@ export function ThemedButton({
     case "primary":
       bgColor = primaryColor;
       txtColor = "#FFFFFF";
-      borderColor = primaryColor;
+      borderColor = Platform.OS === "android" ? "transparent" : primaryColor;
       break;
     case "secondary":
       bgColor = accentColor;
       txtColor = "#FFFFFF";
-      borderColor = accentColor;
+      borderColor = Platform.OS === "android" ? "transparent" : accentColor;
       break;
     case "outline":
       bgColor = "transparent";
@@ -85,6 +85,9 @@ export function ThemedButton({
   // Apply opacity if disabled
   const opacityStyle = disabled ? { opacity: 0.6 } : {};
 
+  // Specific styling for Android outline variant
+  const isOutlineAndroid = Platform.OS === "android" && variant === "outline";
+
   return (
     <TouchableOpacity
       style={[
@@ -95,6 +98,7 @@ export function ThemedButton({
           (Platform.OS === "ios"
             ? styles.withShadowIOS
             : styles.withShadowAndroid),
+        isOutlineAndroid && styles.outlineAndroid,
         opacityStyle,
         style,
       ]}
@@ -119,7 +123,7 @@ export function ThemedButton({
 const styles = StyleSheet.create({
   button: {
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: Platform.OS === "ios" ? 1 : 0,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -131,6 +135,11 @@ const styles = StyleSheet.create({
   },
   withShadowAndroid: {
     elevation: 3,
+  },
+  outlineAndroid: {
+    elevation: 0,
+    borderWidth: 1,
+    backgroundColor: "transparent",
   },
   buttonSmall: {
     paddingVertical: 8,
