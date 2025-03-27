@@ -44,7 +44,7 @@
 
 ## Tests Unitarios
 
-Hemos implementado tres tests críticos que verifican la funcionalidad principal de la aplicación:
+Implemente tres tests críticos que verifican la funcionalidad principal de la aplicación:
 
 1. **OrderStore.test.ts** - Prueba la gestión de órdenes usando el enfoque de renderHook para probar hooks de forma aislada:
 
