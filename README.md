@@ -44,7 +44,7 @@
 
 ## Tests Unitarios
 
-Implemente tres tests críticos que verifican la funcionalidad principal de la aplicación:
+He implementado tres tests críticos que verifican la funcionalidad principal de la aplicación:
 
 1. **OrderStore.test.ts** - Prueba la gestión de órdenes usando el enfoque de renderHook para probar hooks de forma aislada:
 
@@ -72,7 +72,7 @@ npm test
 
 ### Configuración de Testing
 
-El proyecto está configurado con:
+He configurado el proyecto con:
 
 - **Jest** como framework de testing
 - **Testing Library** para pruebas centradas en el usuario
@@ -93,35 +93,35 @@ El proyecto está configurado con:
 
 ## Decisiones Técnicas
 
-Durante el desarrollo de esta aplicación, se tomaron las siguientes decisiones técnicas para garantizar una experiencia de usuario óptima y un código mantenible:
+Durante el desarrollo de esta aplicación, tomé las siguientes decisiones técnicas para garantizar una experiencia de usuario óptima y un código mantenible:
 
 ### Experiencia de Usuario
 
-- **Implementación de Skeletons**: Se incorporaron componentes de tipo "skeleton" tanto en la sección de instrumentos como en el portfolio para mejorar la experiencia de usuario durante la carga de datos, proporcionando una indicación visual del contenido que se está cargando.
+- **Implementación de Skeletons**: Incorporé componentes de tipo "skeleton" tanto en la sección de instrumentos como en el portfolio para mejorar la experiencia de usuario durante la carga de datos, proporcionando una indicación visual del contenido que se está cargando.
 
-- **Sistema de Loaders**: Se implementaron indicadores de carga en todas las secciones críticas de la aplicación para proporcionar feedback continuo al usuario durante las operaciones que requieren tiempo de procesamiento.
+- **Sistema de Loaders**: Implementé indicadores de carga en todas las secciones críticas de la aplicación para proporcionar feedback continuo al usuario durante las operaciones que requieren tiempo de procesamiento.
 
-- **Debounce en Búsquedas**: Se aplicó la técnica de debounce en el buscador de instrumentos para optimizar el rendimiento, reduciendo el número de llamadas a la API y mejorando la eficiencia del sistema.
+- **Debounce en Búsquedas**: Apliqué la técnica de debounce en el buscador de instrumentos para optimizar el rendimiento, reduciendo el número de llamadas a la API y mejorando la eficiencia del sistema.
 
-- **Visualización de Portfolio**: Además de la vista en lista tradicional, se desarrolló una visualización en forma de gráfico para el portfolio, permitiendo al usuario interpretar de manera más intuitiva la distribución de sus inversiones.
+- **Visualización de Portfolio**: Además de la vista en lista tradicional, desarrollé una visualización en forma de gráfico para el portfolio, permitiendo al usuario interpretar de manera más intuitiva la distribución de sus inversiones.
 
 ### Arquitectura y Estado
 
-- **Gestión de Estado con Zustand**: Se implementó Zustand como solución para la gestión del estado global de la aplicación, específicamente para el manejo de órdenes creadas, proporcionando una alternativa ligera y eficiente a Redux.
+- **Gestión de Estado con Zustand**: Implementé Zustand como solución para la gestión del estado global de la aplicación, específicamente para el manejo de órdenes creadas, proporcionando una alternativa ligera y eficiente a Redux.
 
-- **Persistencia con AsyncStorage**: Para garantizar la persistencia de datos entre sesiones, se utilizó AsyncStorage para almacenar localmente las órdenes creadas y las preferencias de tema seleccionadas por el usuario.
+- **Persistencia con AsyncStorage**: Para garantizar la persistencia de datos entre sesiones, utilicé AsyncStorage para almacenar localmente las órdenes creadas y las preferencias de tema seleccionadas por el usuario.
 
-- **Optimización de Peticiones con React Query**: Se integró React Query para gestionar el cacheo de las peticiones HTTP, mejorando significativamente los tiempos de respuesta y reduciendo la carga en el servidor al evitar peticiones redundantes.
+- **Optimización de Peticiones con React Query**: Integré React Query para gestionar el cacheo de las peticiones HTTP, mejorando significativamente los tiempos de respuesta y reduciendo la carga en el servidor al evitar peticiones redundantes.
 
 ### Organización y Calidad del Código
 
-- **Arquitectura Modular para API**: Se desarrolló un módulo específico para centralizar todas las llamadas a la API, facilitando el mantenimiento y la escalabilidad del código al tener las peticiones aisladas en archivos específicos.
+- **Arquitectura Modular para API**: Desarrollé un módulo específico para centralizar todas las llamadas a la API, facilitando el mantenimiento y la escalabilidad del código al tener las peticiones aisladas en archivos específicos.
 
-- **Custom Hooks para Separación de Responsabilidades**: Se implementaron numerosos hooks personalizados (como `useInstruments`, `useFilteredInstruments`, `useOrderStyles`, etc.) para extraer y centralizar la lógica de negocio, manteniéndola aislada de los componentes de UI. Esta separación permite:
+- **Custom Hooks para Separación de Responsabilidades**: Implementé numerosos hooks personalizados (como `useInstruments`, `useFilteredInstruments`, `useOrderStyles`, etc.) para extraer y centralizar la lógica de negocio, manteniéndola aislada de los componentes de UI. Esta separación me permitió:
 
-  - Componentes más limpios y enfocados únicamente en la presentación
-  - Mayor reutilización de lógica a través de la aplicación
-  - Pruebas unitarias más sencillas al poder probar la lógica de forma aislada
-  - Mejor mantenibilidad y facilidad para realizar cambios
+  - Crear componentes más limpios y enfocados únicamente en la presentación
+  - Lograr mayor reutilización de lógica a través de la aplicación
+  - Escribir pruebas unitarias más sencillas al poder probar la lógica de forma aislada
+  - Mejorar la mantenibilidad y facilidad para realizar cambios
 
-- **Tipado Estricto con TypeScript**: Se implementó un sistema de tipado estricto para la mayoría de las funciones y peticiones, mejorando la robustez del código, facilitando el desarrollo y reduciendo la probabilidad de errores en tiempo de ejecución.
+- **Tipado Estricto con TypeScript**: Implementé un sistema de tipado estricto para la mayoría de las funciones y peticiones, mejorando la robustez del código, facilitando el desarrollo y reduciendo la probabilidad de errores en tiempo de ejecución.
