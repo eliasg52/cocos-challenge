@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import tradingApi from "@/api/tradingApi";
 import { Instrument } from "@/types";
+import tradingApi from "@/api/tradingApi";
 
 export const useInstruments = () => {
   return useQuery<Instrument[]>({

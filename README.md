@@ -42,6 +42,43 @@
    npm run android
    ```
 
+## Tests Unitarios
+
+Hemos implementado tres tests críticos que verifican la funcionalidad principal de la aplicación:
+
+1. **OrderStore.test.ts** - Prueba la gestión de órdenes usando el enfoque de renderHook para probar hooks de forma aislada:
+
+   - Verifica que se puedan añadir órdenes correctamente
+   - Comprueba que las órdenes se pueden eliminar
+   - Valida el cálculo correcto del valor total de una orden
+
+2. **ApiIntegration.test.tsx** - Verifica la comunicación con el backend usando React Query:
+
+   - Comprueba la obtención correcta de datos
+   - Maneja de forma adecuada los errores de red
+   - Utiliza mocks para simular peticiones a la API sin generar peticiones reales
+
+3. **SearchDebounce.test.tsx** - Valida la funcionalidad de búsqueda con debounce:
+   - Utiliza un componente sencillo para simular la lógica de búsqueda con debounce
+   - Verifica que las búsquedas no se ejecutan inmediatamente
+   - Comprueba que las búsquedas anteriores se cancelan cuando se proporciona un nuevo input
+   - Demuestra el uso de jest.advanceTimersByTime para controlar el tiempo en los tests
+
+Para ejecutar los tests:
+
+```bash
+npm test
+```
+
+### Configuración de Testing
+
+El proyecto está configurado con:
+
+- **Jest** como framework de testing
+- **Testing Library** para pruebas centradas en el usuario
+- **jest-expo** como preset para compatibilidad con Expo
+- Mocks para APIs, AsyncStorage y otros servicios nativos
+
 ## Notas adicionales
 
 - Este proyecto utiliza Expo como framework base y React Native
