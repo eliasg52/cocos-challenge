@@ -117,4 +117,11 @@ Durante el desarrollo de esta aplicación, se tomaron las siguientes decisiones 
 
 - **Arquitectura Modular para API**: Se desarrolló un módulo específico para centralizar todas las llamadas a la API, facilitando el mantenimiento y la escalabilidad del código al tener las peticiones aisladas en archivos específicos.
 
+- **Custom Hooks para Separación de Responsabilidades**: Se implementaron numerosos hooks personalizados (como `useInstruments`, `useFilteredInstruments`, `useOrderStyles`, etc.) para extraer y centralizar la lógica de negocio, manteniéndola aislada de los componentes de UI. Esta separación permite:
+
+  - Componentes más limpios y enfocados únicamente en la presentación
+  - Mayor reutilización de lógica a través de la aplicación
+  - Pruebas unitarias más sencillas al poder probar la lógica de forma aislada
+  - Mejor mantenibilidad y facilidad para realizar cambios
+
 - **Tipado Estricto con TypeScript**: Se implementó un sistema de tipado estricto para la mayoría de las funciones y peticiones, mejorando la robustez del código, facilitando el desarrollo y reduciendo la probabilidad de errores en tiempo de ejecución.

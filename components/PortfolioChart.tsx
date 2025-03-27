@@ -1,6 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { PieChart } from "react-native-chart-kit";
+
 import { ThemedText } from "./ThemedText";
 import { ThemedView } from "./ThemedView";
 import { ThemedCard } from "./ThemedCard";

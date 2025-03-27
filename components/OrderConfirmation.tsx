@@ -1,6 +1,5 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -20,11 +19,9 @@ const OrderConfirmation = ({
 }: OrderConfirmationProps) => {
   const router = useRouter();
 
-  const tintColor = useThemeColor({}, "tint");
   const accentColor = useThemeColor({}, "accent");
   const positiveColor = useThemeColor({}, "positive");
   const negativeColor = useThemeColor({}, "negative");
-  const secondaryTextColor = useThemeColor({}, "secondaryText");
 
   const getStatusColor = () => {
     switch (status as OrderStatus) {
